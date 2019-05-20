@@ -47,6 +47,9 @@
 #include "hci_control_api.h"
 #endif
 
+#include "wiced_bt_cfg.h"
+extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
+
 /******************************************************
  *          Constants
  ******************************************************/
@@ -83,8 +86,6 @@ static void mesh_power_level_hci_event_send_range_status(wiced_bt_mesh_hci_event
 /******************************************************
  *          Variables Definitions
  ******************************************************/
-char   *mesh_dev_name                                                      = "Power Level Client";
-uint8_t mesh_appearance[WICED_BT_MESH_PROPERTY_LEN_DEVICE_APPEARANCE]      = { BIT16_TO_8(APPEARANCE_GENERIC_TAG) };
 uint8_t mesh_mfr_name[WICED_BT_MESH_PROPERTY_LEN_DEVICE_MANUFACTURER_NAME] = { 'C', 'y', 'p', 'r', 'e', 's', 's', 0 };
 uint8_t mesh_model_num[WICED_BT_MESH_PROPERTY_LEN_DEVICE_MODEL_NUMBER]     = { '1', '2', '3', '4', 0, 0, 0, 0 };
 uint8_t mesh_system_id[8]                                                  = { 0xbb, 0xb8, 0xa1, 0x80, 0x5f, 0x9f, 0x91, 0x71 };
@@ -129,7 +130,8 @@ wiced_bt_mesh_core_config_t  mesh_config =
     .friend_cfg         =                                           // Empty Configuration of the Friend Feature
     {
         .receive_window = 0,                                        // Receive Window value in milliseconds supported by the Friend node.
-        .cache_buf_len  = 0                                         // Length of the buffer for the cache
+        .cache_buf_len  = 0,                                        // Length of the buffer for the cache
+        .max_lpn_num    = 0                                         // Max number of Low Power Nodes with established friendship. Must be > 0 if Friend feature is supported.
     },
     .low_power          =                                           // Configuration of the Low Power Feature
     {
@@ -144,7 +146,8 @@ wiced_bt_mesh_core_config_t  mesh_config =
     .friend_cfg         =                                           // Configuration of the Friend Feature(Receive Window in Ms, messages cache)
     {
         .receive_window        = 200,
-        .cache_buf_len         = 300                                // Length of the buffer for the cache
+        .cache_buf_len         = 300,                               // Length of the buffer for the cache
+        .max_lpn_num           = 4                                  // Max number of Low Power Nodes with established friendship. Must be > 0 if Friend feature is supported.
     },
     .low_power          =                                           // Configuration of the Low Power Feature
     {
@@ -180,6 +183,29 @@ wiced_bt_mesh_app_func_table_t wiced_bt_mesh_app_func_table =
  ******************************************************/
 void mesh_app_init(wiced_bool_t is_provisioned)
 {
+    wiced_bt_cfg_settings.device_name = (uint8_t *)"Power Level Client";
+    wiced_bt_cfg_settings.gatt_cfg.appearance = APPEARANCE_GENERIC_TAG;
+    // Adv Data is fixed. Spec allows to put URI, Name, Appearance and Tx Power in the Scan Response Data.
+    if (!is_provisioned)
+    {
+        wiced_bt_ble_advert_elem_t  adv_elem[3];
+        uint8_t                     buf[2];
+        uint8_t                     num_elem = 0;
+        adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_NAME_COMPLETE;
+        adv_elem[num_elem].len = (uint16_t)strlen((const char*)wiced_bt_cfg_settings.device_name);
+        adv_elem[num_elem].p_data = wiced_bt_cfg_settings.device_name;
+        num_elem++;
+
+        adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_APPEARANCE;
+        adv_elem[num_elem].len = 2;
+        buf[0] = (uint8_t)wiced_bt_cfg_settings.gatt_cfg.appearance;
+        buf[1] = (uint8_t)(wiced_bt_cfg_settings.gatt_cfg.appearance >> 8);
+        adv_elem[num_elem].p_data = buf;
+        num_elem++;
+
+        wiced_bt_mesh_set_raw_scan_response_data(num_elem, adv_elem);
+    }
+
     wiced_bt_mesh_model_power_level_client_init(MESH_POWER_LEVEL_CLIENT_ELEMENT_INDEX, mesh_power_level_client_message_handler, is_provisioned);
 }
 

@@ -38,7 +38,7 @@ CONFIG = Debug
 
 CY_EXAMPLE_NAME = LowPower
 
-CY_EXAMPLE_DESCRIPTION = This application demonstrates how to use low power in 20819.
+CY_EXAMPLE_DESCRIPTION = This application demonstrates how to use low power in CYW208XX.
 
 CY_SHOW_NEW_PROJECT := true
 

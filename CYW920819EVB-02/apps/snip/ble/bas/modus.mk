@@ -59,7 +59,7 @@ endif # PLATFORM
 ifeq ($(PLATFORM),CYW920735Q60EVB-01)
 endif # PLATFORM
 
-ifeq ($(PLATFORM),CYW920819EVB-02)
+ifneq ($(filter CYW920819EVB-02 CYW920820EVB-02 CYBT-213043-EVAL,$(PLATFORM)),)
 endif # PLATFORM
 
 # NOTE: This variable cannot be renamed or moved to a different file. It is updated by the ModusToolbox

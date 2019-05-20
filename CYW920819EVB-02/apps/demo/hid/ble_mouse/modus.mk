@@ -124,7 +124,6 @@ CY_APP_SOURCE = \
   ./appinit_ble_mouse.c \
   ./ble_mouse.c \
   ./ble_mouse.h \
-  ./ble_mouse_gatts.c \
   ./ble_mouse_gatts.h \
   ./wiced_bt_cfg.c \
   ./readme.txt \

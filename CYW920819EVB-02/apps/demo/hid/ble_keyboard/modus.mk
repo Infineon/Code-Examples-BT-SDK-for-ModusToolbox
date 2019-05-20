@@ -133,7 +133,6 @@ CY_APP_SOURCE = \
   ./appinit_ble_keyboard.c \
   ./ble_keyboard.c \
   ./ble_keyboard.h \
-  ./ble_keyboard_gatts.c \
   ./ble_keyboard_gatts.h \
   ./wiced_bt_cfg.c \
   ./readme.txt \

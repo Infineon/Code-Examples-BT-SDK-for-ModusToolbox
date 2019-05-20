@@ -38,7 +38,7 @@ CONFIG = Debug
 
 CY_EXAMPLE_NAME = HAL_Dual_SPI_Master
 
-CY_EXAMPLE_DESCRIPTION = This application demonstrates two SPI master instances via multiple threads on CYW920819EVB-02. SPI1 instance is used to communicating with an external SPI sensor and SPI2 instance is used to communicate with on-board SFLASH.
+CY_EXAMPLE_DESCRIPTION = This application demonstrates two SPI master instances via multiple threads on CYW9208XXEVB-02. SPI1 instance is used to communicating with an external SPI sensor and SPI2 instance is used to communicate with on-board SFLASH.
 
 CY_SHOW_NEW_PROJECT := true
 

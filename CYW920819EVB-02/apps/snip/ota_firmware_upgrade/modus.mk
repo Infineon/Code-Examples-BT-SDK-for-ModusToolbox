@@ -74,9 +74,6 @@ endif # PLATFORM
 ifeq ($(PLATFORM),CYW920735Q60EVB-01)
 endif # PLATFORM
 
-ifneq ($(filter 20819 CYBT-213043-MESH CYW920819EVB-02,$(PLATFORM)),)
-endif # PLATFORM
-
 # NOTE: This variable cannot be renamed or moved to a different file. It is updated by the ModusToolbox
 # middleware editor.
 CY_MAINAPP_SWCOMP_EXT =

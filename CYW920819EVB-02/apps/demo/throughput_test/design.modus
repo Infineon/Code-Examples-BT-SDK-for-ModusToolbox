@@ -7,7 +7,7 @@
     <Kit name="CYW920819EVB-02" version="1.0"/>
   </Kits>
   <Libraries>
-    <Library name="bt_20819A1" version="1.0"/>
+    <Library name="bt_sdk" version="1.1"/>
   </Libraries>
   <ConfiguratorData/>
   <BlockConfig>

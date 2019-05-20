@@ -18,7 +18,7 @@ Features demonstrated
  - LED usage on the CYBT-213043-MESH EZ-BT Mesh Evaluation Kit / CYW920819EVB-02 Evaluation Kit
  - Processing of the Light Lightness messages
 
-See 20819_readme.txt for more information about the BT SDK.
+See chip specific readme for more information about the BT SDK.
 
 Instructions
 ------------
@@ -51,7 +51,7 @@ Notes
 1. The board will factory reset if you press and hold the user button (SW3) on
    the board for more than 15 seconds.
 2. The application GATT database is located in -
-   bt_20819A1-1.0\components\BT-SDK\common\libraries\mesh_app_lib\mesh_app_gatt.c
+   bt_sdk-1.x\components\BT-SDK\common\libraries\mesh_app_lib\mesh_app_gatt.c
    If you create a GATT database using Bluetooth Configurator, update the
    GATT database in the location mentioned above.
 

@@ -63,7 +63,10 @@ CY_APP_DEFINES +=   \
   -DWICED_HCI_BAUDRATE=115200
 endif # PLATFORM
 
-ifeq ($(PLATFORM),CYW920819EVB-02)
+ifneq ($(filter CYW920819EVB-02 CYW920820EVB-02 CYBT-213043-EVAL,$(PLATFORM)),)
+endif # PLATFORM
+
+ifeq ($(PLATFORM),CYW920721B2EVK-01)
 endif # PLATFORM
 
 # NOTE: This variable cannot be renamed or moved to a different file. It is updated by the ModusToolbox
@@ -71,7 +74,7 @@ endif # PLATFORM
 CY_MAINAPP_SWCOMP_EXT =
 
 CY_APP_SOURCE =   \
-  ../hello_sensor/hello_sensor.h \
+  ./hello_sensor.h \
   ./hello_client.c \
   ./wiced_bt_cfg.c \
   ./readme.txt

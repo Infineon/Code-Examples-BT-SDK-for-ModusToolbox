@@ -44,7 +44,7 @@
  * 1. Build and download the application (to the WICED board)
  * 2. Use Android MeshController and provision the temperature sensor
  * 3. After successful provisioning, user can use the Android MeshController/Mesh Client to configure the below parameters of the sensor
- *    a> configure sensor to publish the sensor data to a group(all-nodes, all-relays).
+ *    a> configure sensor to publish the sensor data to a specific group or to all-nodes.
  *    b> configure publish period : publish period defines how often the user wants the sensor to publish the data.
  *    c> set cadence of the sensor :
  *       set minimum interval in which sensor data has to be published.
@@ -64,6 +64,9 @@
 #include "wiced_thermistor.h"
 #include "wiced_hal_nvram.h"
 #include "wiced_sleep.h"
+
+#include "wiced_bt_cfg.h"
+extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
 
 /******************************************************
  *          Constants
@@ -116,8 +119,6 @@ static void         mesh_sensor_hci_event_send_setting_set(wiced_bt_mesh_hci_eve
 /******************************************************
  *          Variables Definitions
  ******************************************************/
-char   *mesh_dev_name                                                               = "Temperature Sensor";
-uint8_t mesh_appearance[WICED_BT_MESH_PROPERTY_LEN_DEVICE_APPEARANCE]               = { BIT16_TO_8(APPEARANCE_SENSOR_TEMPERATURE) };
 uint8_t mesh_mfr_name[WICED_BT_MESH_PROPERTY_LEN_DEVICE_MANUFACTURER_NAME]          = { 'C', 'y', 'p', 'r', 'e', 's', 's', 0 };
 uint8_t mesh_model_num[WICED_BT_MESH_PROPERTY_LEN_DEVICE_MODEL_NUMBER]              = { '1', '2', '3', '4', 0, 0, 0, 0 };
 uint8_t mesh_prop_fw_version[WICED_BT_MESH_PROPERTY_LEN_DEVICE_FIRMWARE_REVISION] =   { '0', '6', '.', '0', '2', '.', '0', '5' }; // this is overwritten during init
@@ -147,7 +148,7 @@ wiced_bt_mesh_sensor_config_setting_t sensor_settings[] =
     {
         .setting_property_id = WICED_BT_MESH_PROPERTY_TOTAL_DEVICE_RUNTIME,
         .access              = WICED_BT_MESH_SENSOR_SETTING_READABLE_AND_WRITABLE,
-        .value_len           = 3,
+        .value_len           = WICED_BT_MESH_PROPERTY_LEN_TOTAL_DEVICE_RUNTIME,
         .val                 = mesh_temperature_sensor_setting0_val
     },
 };
@@ -179,8 +180,8 @@ wiced_bt_mesh_core_config_sensor_t mesh_element1_sensors[] =
         },
         .num_series     = 0,
         .series_columns = NULL,
-        .num_settings   = 0,
-        .settings       = NULL,
+        .num_settings   = 1,
+        .settings       = sensor_settings,
     },
 };
 
@@ -221,7 +222,8 @@ wiced_bt_mesh_core_config_t  mesh_config =
     .friend_cfg         =                                           // Empty Configuration of the Friend Feature
     {
         .receive_window = 0,                                        // Receive Window value in milliseconds supported by the Friend node.
-        .cache_buf_len  = 0                                         // Length of the buffer for the cache
+        .cache_buf_len  = 0,                                        // Length of the buffer for the cache
+        .max_lpn_num    = 0                                         // Max number of Low Power Nodes with established friendship. Must be > 0 if Friend feature is supported.
     },
     .low_power          =                                           // Configuration of the Low Power Feature
     {
@@ -236,7 +238,8 @@ wiced_bt_mesh_core_config_t  mesh_config =
     .friend_cfg         =                                           // Configuration of the Friend Feature(Receive Window in Ms, messages cache)
     {
         .receive_window        = 200,
-        .cache_buf_len         = 300                                // Length of the buffer for the cache
+        .cache_buf_len         = 300,                               // Length of the buffer for the cache
+        .max_lpn_num           = 4                                  // Max number of Low Power Nodes with established friendship. Must be > 0 if Friend feature is supported.
     },
     .low_power          =                                           // Configuration of the Low Power Feature
     {
@@ -279,6 +282,31 @@ void mesh_app_init(wiced_bool_t is_provisioned)
     uint32_t        cur_time = wiced_bt_mesh_core_get_tick_count();
     wiced_result_t  result;
     wiced_bt_mesh_core_config_sensor_t *p_sensor;
+
+    wiced_bt_cfg_settings.device_name = (uint8_t *)"Temperature Sensor";
+    wiced_bt_cfg_settings.gatt_cfg.appearance = APPEARANCE_SENSOR_TEMPERATURE;
+
+    // Adv Data is fixed. Spec allows to put URI, Name, Appearance and Tx Power in the Scan Response Data.
+    if (!is_provisioned)
+    {
+        wiced_bt_ble_advert_elem_t  adv_elem[3];
+        uint8_t                     buf[2];
+        uint8_t                     num_elem = 0;
+
+        adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_NAME_COMPLETE;
+        adv_elem[num_elem].len         = (uint16_t)strlen((const char*)wiced_bt_cfg_settings.device_name);
+        adv_elem[num_elem].p_data      = wiced_bt_cfg_settings.device_name;
+        num_elem++;
+
+        adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_APPEARANCE;
+        adv_elem[num_elem].len         = 2;
+        buf[0]                         = (uint8_t)wiced_bt_cfg_settings.gatt_cfg.appearance;
+        buf[1]                         = (uint8_t)(wiced_bt_cfg_settings.gatt_cfg.appearance >> 8);
+        adv_elem[num_elem].p_data      = buf;
+        num_elem++;
+
+        wiced_bt_mesh_set_raw_scan_response_data(num_elem, adv_elem);
+    }
 
     p_sensor = &mesh_config.elements[MESH_SENSOR_SERVER_ELEMENT_INDEX].sensors[MESH_TEMPERATURE_SENSOR_INDEX];
 
@@ -326,7 +354,7 @@ wiced_bool_t mesh_app_notify_period_set(uint8_t element_idx, uint16_t company_id
     {
         return WICED_FALSE;
     }
-    mesh_sensor_publish_period = period * 100;
+    mesh_sensor_publish_period = period;
     WICED_BT_TRACE("Sensor data send period:%dms\n", mesh_sensor_publish_period);
     mesh_sensor_server_restart_timer(&mesh_config.elements[element_idx].sensors[MESH_TEMPERATURE_SENSOR_INDEX]);
     return WICED_TRUE;

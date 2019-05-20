@@ -50,6 +50,9 @@
 #include "wiced_bt_mesh_client.h"
 #include "wiced_memory.h"
 
+#include "wiced_bt_cfg.h"
+extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
+
 uint32_t mesh_onoff_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
 uint32_t mesh_level_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
 uint32_t mesh_light_lightness_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
@@ -88,6 +91,7 @@ static uint8_t mesh_provisioner_process_oob_value(wiced_bt_mesh_event_t *p_event
 static uint8_t mesh_provisioner_process_search_proxy(uint8_t *p_data, uint32_t length);
 static uint8_t mesh_provisioner_process_proxy_connect(uint8_t *p_data, uint32_t length);
 static uint8_t mesh_provisioner_process_proxy_disconnect(uint8_t *p_data, uint32_t length);
+static uint8_t mesh_provisioner_process_raw_model_data(wiced_bt_mesh_event_t *p_event, uint8_t *p_data, uint32_t length);
 static uint8_t mesh_provisioner_process_scan_capabilities_get(wiced_bt_mesh_event_t *p_event, uint8_t *p_data, uint32_t length);
 static uint8_t mesh_provisioner_process_scan_get(wiced_bt_mesh_event_t *p_event, uint8_t *p_data, uint32_t length);
 static uint8_t mesh_provisioner_process_scan_start(wiced_bt_mesh_event_t *p_event, uint8_t *p_data, uint32_t length);
@@ -143,6 +147,7 @@ void mesh_provisioner_hci_event_provision_link_status_send(wiced_bt_mesh_hci_eve
 void mesh_provisioner_hci_event_provision_link_report_send(wiced_bt_mesh_hci_event_t *p_hci_event, wiced_bt_mesh_provision_link_report_data_t *p_data);
 static void mesh_provisioner_hci_event_device_capabilities_send(wiced_bt_mesh_hci_event_t *p_hci_event, wiced_bt_mesh_provision_device_capabilities_data_t *p_data);
 static void mesh_provisioner_hci_event_device_get_oob_data_send(wiced_bt_mesh_hci_event_t *p_hci_event, wiced_bt_mesh_provision_device_oob_request_data_t *p_data);
+static void mesh_provisioner_hci_event_proxy_connection_status_send(wiced_bt_mesh_hci_event_t *p_hci_event, wiced_bt_mesh_connect_status_data_t *p_data);
 static void mesh_provisioner_hci_event_node_reset_status_send(wiced_bt_mesh_hci_event_t *p_hci_event);
 static void mesh_provisioner_hci_event_node_identity_status_send(wiced_bt_mesh_hci_event_t *p_hci_event, wiced_bt_mesh_config_node_identity_status_data_t *p_data);
 static void mesh_provisioner_hci_event_composition_data_status_send(wiced_bt_mesh_hci_event_t *p_hci_event, wiced_bt_mesh_config_composition_data_status_data_t *p_data);
@@ -183,8 +188,6 @@ static void mesh_provisioner_hci_send_status(uint8_t status);
 uint8_t pb_priv_key[WICED_BT_MESH_PROVISION_PRIV_KEY_LEN] = { 0x52, 0x9A, 0xA0, 0x67, 0x0D, 0x72, 0xCD, 0x64, 0x97, 0x50, 0x2E, 0xD4, 0x73, 0x50, 0x2B, 0x03, 0x7E, 0x88, 0x03, 0xB5, 0xC6, 0x08, 0x29, 0xA5, 0xA3, 0xCA, 0xA2, 0x19, 0x50, 0x55, 0x30, 0xBA };
 #endif
 
-char   *mesh_dev_name                                                      = "Provisioner Client";
-uint8_t mesh_appearance[WICED_BT_MESH_PROPERTY_LEN_DEVICE_APPEARANCE]      = { BIT16_TO_8(APPEARANCE_GENERIC_TAG) };
 uint8_t mesh_mfr_name[WICED_BT_MESH_PROPERTY_LEN_DEVICE_MANUFACTURER_NAME] = { 'C', 'y', 'p', 'r', 'e', 's', 's', 0 };
 uint8_t mesh_model_num[WICED_BT_MESH_PROPERTY_LEN_DEVICE_MODEL_NUMBER]     = { '1', '2', '3', '4', 0, 0, 0, 0 };
 uint8_t mesh_system_id[8]                                                  = { 0xbb, 0xb8, 0xa1, 0x80, 0x5f, 0x9f, 0x91, 0x71 };
@@ -246,7 +249,8 @@ wiced_bt_mesh_core_config_t  mesh_config =
     .friend_cfg         =                                           // Empty Configuration of the Friend Feature
     {
         .receive_window        = 0,                                 // Receive Window value in milliseconds supported by the Friend node.
-        .cache_buf_len         = 0                                  // Length of the buffer for the cache
+        .cache_buf_len  = 0,                                        // Length of the buffer for the cache
+        .max_lpn_num    = 0                                         // Max number of Low Power Nodes with established friendship. Must be > 0 if Friend feature is supported.
     },
     .low_power          =                                           // Configuration of the Low Power Feature
     {
@@ -283,7 +287,7 @@ extern void mesh_light_lightness_client_message_handler(uint16_t event, wiced_bt
 extern void mesh_light_ctl_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
 extern void mesh_light_hsl_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
 extern void mesh_default_transition_time_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
-extern void mesh_sensor_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
+extern void mesh_sensor_client_message_handler(uint8_t element_idx, uint16_t addr, uint16_t event, void *p_data);
 
 // This application is the only one that can connect to the mesh over proxy and
 // need to process proxy status messages.  It needs to fill the pointer in the mesh_application.c.
@@ -312,6 +316,29 @@ void mesh_app_init(wiced_bool_t is_provisioned)
 //    wiced_bt_mesh_core_set_trace_level((1 << FID_MESH_APP__PB_TRANSPORT_C), 0);
 #endif
 
+    wiced_bt_cfg_settings.device_name = (uint8_t *)"Provisioner Client";
+    wiced_bt_cfg_settings.gatt_cfg.appearance = APPEARANCE_GENERIC_TAG;
+    // Adv Data is fixed. Spec allows to put URI, Name, Appearance and Tx Power in the Scan Response Data.
+    if (!is_provisioned)
+    {
+        wiced_bt_ble_advert_elem_t  adv_elem[3];
+        uint8_t                     buf[2];
+        uint8_t                     num_elem = 0;
+        adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_NAME_COMPLETE;
+        adv_elem[num_elem].len = (uint16_t)strlen((const char*)wiced_bt_cfg_settings.device_name);
+        adv_elem[num_elem].p_data = wiced_bt_cfg_settings.device_name;
+        num_elem++;
+
+        adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_APPEARANCE;
+        adv_elem[num_elem].len = 2;
+        buf[0] = (uint8_t)wiced_bt_cfg_settings.gatt_cfg.appearance;
+        buf[1] = (uint8_t)(wiced_bt_cfg_settings.gatt_cfg.appearance >> 8);
+        adv_elem[num_elem].p_data = buf;
+        num_elem++;
+
+        wiced_bt_mesh_set_raw_scan_response_data(num_elem, adv_elem);
+    }
+
     wiced_bt_mesh_remote_provisioning_server_init();
 
     // for the embedded client we are already provisioned because
@@ -333,7 +360,37 @@ void mesh_app_init(wiced_bool_t is_provisioned)
     wiced_bt_mesh_model_scene_client_init(0, mesh_scene_client_message_handler, is_provisioned);
 
     p_proxy_status_message_handler = mesh_proxy_client_process_filter_status;
+}
 
+wiced_bool_t mesh_model_raw_data_message_handler(wiced_bt_mesh_event_t *p_event, const uint8_t *params, uint16_t params_len)
+{
+    wiced_bt_mesh_hci_event_t *p_hci_event = wiced_bt_mesh_create_hci_event(p_event);
+    uint8_t *p = p_hci_event->data;
+    if (p_hci_event == NULL)
+    {
+        WICED_BT_TRACE("model raw data no mem\n");
+        return WICED_FALSE;
+    }
+    WICED_BT_TRACE("model raw data opcode:%04x\n", p_event->opcode);
+
+    if (p_event->company_id == MESH_COMPANY_ID_BT_SIG)
+    {
+        *p++ = (p_event->opcode >> 8) & 0xff;
+        *p++ = p_event->opcode & 0xff;
+    }
+    else
+    {
+#define MESH_APP_PAYLOAD_OP_LONG              0x80
+#define MESH_APP_PAYLOAD_OP_MANUF_SPECIFIC    0x40
+        *p++ = (p_event->opcode | MESH_APP_PAYLOAD_OP_LONG | MESH_APP_PAYLOAD_OP_MANUF_SPECIFIC) & 0xff;
+        *p++ = (p_event->company_id >> 8) & 0xff;
+        *p++ = p_event->company_id & 0xff;
+    }
+    memcpy(p, params, params_len);
+    p += params_len;
+
+    mesh_transport_send_data(HCI_CONTROL_MESH_EVENT_RAW_MODEL_DATA, (uint8_t *)p_hci_event, (uint16_t)(p - (uint8_t *)p_hci_event));
+    return WICED_TRUE;
 }
 
 /*
@@ -504,6 +561,10 @@ void mesh_config_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p
         mesh_provisioner_hci_event_device_get_oob_data_send(p_hci_event, (wiced_bt_mesh_provision_device_oob_request_data_t *)p_data);
         break;
 
+    case WICED_BT_MESH_PROXY_CONNECTION_STATUS:
+        mesh_provisioner_hci_event_proxy_connection_status_send(p_hci_event, (wiced_bt_mesh_connect_status_data_t *)p_data);
+        break;
+
     default:
         WICED_BT_TRACE("ignored\n");
         break;
@@ -610,6 +671,7 @@ uint32_t mesh_app_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length)
     case HCI_CONTROL_MESH_COMMAND_CONFIG_NETWORK_TRANSMIT_GET:
     case HCI_CONTROL_MESH_COMMAND_CONFIG_NETWORK_TRANSMIT_SET:
     case HCI_CONTROL_MESH_COMMAND_CONFIG_LPN_POLL_TIMEOUT_GET:
+    case HCI_CONTROL_MESH_COMMAND_RAW_MODEL_DATA:
         p_event = wiced_bt_mesh_create_event_from_wiced_hci(opcode, MESH_COMPANY_ID_BT_SIG, WICED_BT_MESH_CORE_MODEL_ID_CONFIG_CLNT, &p_data, &length);
         if (p_event == NULL)
         {
@@ -621,7 +683,7 @@ uint32_t mesh_app_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length)
     case HCI_CONTROL_MESH_COMMAND_PROXY_FILTER_TYPE_SET:
     case HCI_CONTROL_MESH_COMMAND_PROXY_FILTER_ADDRESSES_ADD:
     case HCI_CONTROL_MESH_COMMAND_PROXY_FILTER_ADDRESSES_DELETE:
-        p_event = wiced_bt_mesh_create_event_from_wiced_hci(opcode, 0xFFFF, WICED_BT_MESH_CORE_MODEL_ID_CONFIG_CLNT, &p_data, &length);
+        p_event = wiced_bt_mesh_create_event_from_wiced_hci(opcode, MESH_COMPANY_ID_UNUSED, WICED_BT_MESH_CORE_MODEL_ID_CONFIG_CLNT, &p_data, &length);
         if (p_event == NULL)
         {
             WICED_BT_TRACE("bad hdr\n");
@@ -888,6 +950,11 @@ uint32_t mesh_app_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length)
         status = mesh_provisioner_process_health_attention_set(p_event, p_data, length);
         break;
 
+    case HCI_CONTROL_MESH_COMMAND_RAW_MODEL_DATA:
+        status = mesh_provisioner_process_raw_model_data(p_event, p_data, length);
+        mesh_provisioner_hci_send_status(status);
+        return WICED_TRUE;
+
     default:
         wiced_bt_mesh_release_event(p_event);
         break;
@@ -897,11 +964,35 @@ uint32_t mesh_app_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length)
 }
 
 /*
+ * Process command from MCU to disconnect GATT Proxy
+ */
+uint8_t mesh_provisioner_process_raw_model_data(wiced_bt_mesh_event_t *p_event, uint8_t *p_data, uint32_t length)
+{
+    if ((p_data[0] & (MESH_APP_PAYLOAD_OP_LONG | MESH_APP_PAYLOAD_OP_MANUF_SPECIFIC)) == (MESH_APP_PAYLOAD_OP_LONG | MESH_APP_PAYLOAD_OP_MANUF_SPECIFIC))
+    {
+        p_event->opcode = p_data[0] & ~(MESH_APP_PAYLOAD_OP_LONG | MESH_APP_PAYLOAD_OP_MANUF_SPECIFIC);
+        p_event->company_id = (p_data[1] << 8) + p_data[2];
+        p_data += 3;
+        length -= 3;
+    }
+    else
+    {
+        p_event->company_id = MESH_COMPANY_ID_BT_SIG;
+        p_event->opcode = (p_data[0] << 8) + p_data[1];
+        p_data += 2;
+        length -= 2;
+    }
+    wiced_bt_mesh_core_send(p_event, p_data, length, NULL);
+    return HCI_CONTROL_MESH_STATUS_SUCCESS;
+}
+
+/*
  * Process command from MCU to setup local device
  */
 uint8_t mesh_provisioner_process_set_local_device(uint8_t *p_data, uint32_t length)
 {
     wiced_bt_mesh_local_device_set_data_t set;
+    uint8_t model_level_access;
 
     STREAM_TO_UINT16(set.addr, p_data);
     STREAM_TO_ARRAY(set.dev_key, p_data, 16);
@@ -910,10 +1001,17 @@ uint8_t mesh_provisioner_process_set_local_device(uint8_t *p_data, uint32_t leng
     STREAM_TO_UINT32(set.iv_idx, p_data);
     STREAM_TO_UINT8(set.key_refresh, p_data);
     STREAM_TO_UINT8(set.iv_update, p_data);
+    STREAM_TO_UINT8(model_level_access, p_data);
 
-    WICED_BT_TRACE("addr:%x net_key_idx:%x iv_idx:%x key_refresh:%d iv_upd:%d\n", set.addr, set.net_key_idx, set.iv_idx, set.key_refresh, set.iv_update);
+    WICED_BT_TRACE("addr:%x net_key_idx:%x iv_idx:%x key_refresh:%d iv_upd:%d model_access:%d\n", set.addr, set.net_key_idx, set.iv_idx, set.key_refresh, set.iv_update, model_level_access);
     mesh_gatt_client_local_device_set(&set);
     mesh_app_init(WICED_TRUE);
+
+    if (model_level_access)
+    {
+        extern wiced_bt_mesh_core_received_msg_handler_t p_app_model_message_handler;
+        p_app_model_message_handler = mesh_model_raw_data_message_handler;
+    }
     return HCI_CONTROL_MESH_STATUS_SUCCESS;
 }
 
@@ -925,6 +1023,7 @@ uint8_t mesh_provisioner_process_set_dev_key(uint8_t *p_data, uint32_t length)
     wiced_bt_mesh_set_dev_key_data_t set;
     STREAM_TO_UINT16(set.dst, p_data);
     STREAM_TO_ARRAY(set.dev_key, p_data, 16);
+    STREAM_TO_UINT16(set.net_key_idx, p_data);
     wiced_bt_mesh_provision_set_dev_key(&set);
     return HCI_CONTROL_MESH_STATUS_SUCCESS;
 }
@@ -1028,6 +1127,7 @@ uint8_t mesh_provisioner_process_start(wiced_bt_mesh_event_t *p_event, uint8_t *
     wiced_bt_mesh_provision_start_data_t start;
 
     STREAM_TO_UINT16(start.addr, p_data);
+    STREAM_TO_UINT16(start.net_key_idx, p_data);
     STREAM_TO_UINT8(start.algorithm, p_data);
     STREAM_TO_UINT8(start.public_key_type, p_data);
     STREAM_TO_UINT8(start.auth_method, p_data);
@@ -1098,7 +1198,6 @@ uint8_t mesh_provisioner_process_proxy_disconnect(uint8_t *p_data, uint32_t leng
 {
     return wiced_bt_mesh_client_proxy_disconnect() ? HCI_CONTROL_MESH_STATUS_SUCCESS : HCI_CONTROL_MESH_STATUS_ERROR;
 }
-
 
 /*
  * Process command from MCU to Reset Node
@@ -1647,7 +1746,9 @@ void mesh_provisioner_hci_event_scan_report_send(wiced_bt_mesh_hci_event_t *p_hc
     ARRAY_TO_STREAM(p, p_data->uuid, 16);
     UINT16_TO_STREAM(p, p_data->oob);
     UINT32_TO_STREAM(p, p_data->uri_hash);
-
+#ifdef PROVISION_SCAN_REPORT_INCLUDE_BDADDR
+    BDADDR_TO_STREAM(p, p_data->bdaddr);
+#endif
     mesh_transport_send_data(HCI_CONTROL_MESH_EVENT_PROVISION_SCAN_REPORT, (uint8_t *)p_hci_event, (uint16_t)(p - (uint8_t *)p_hci_event));
 }
 
@@ -1771,6 +1872,20 @@ void mesh_provisioner_hci_event_device_get_oob_data_send(wiced_bt_mesh_hci_event
     UINT8_TO_STREAM(p, p_oob_data->action);
 
     mesh_transport_send_data(HCI_CONTROL_MESH_EVENT_PROVISION_OOB_DATA, (uint8_t *)p_hci_event, (uint16_t)(p - (uint8_t *)p_hci_event));
+}
+
+void mesh_provisioner_hci_event_proxy_connection_status_send(wiced_bt_mesh_hci_event_t *p_hci_event, wiced_bt_mesh_connect_status_data_t *p_data)
+{
+    uint8_t *p = p_hci_event->data;
+
+    WICED_BT_TRACE("mesh proxy connection status:%d\n", p_data->connected);
+
+    UINT16_TO_STREAM(p, p_data->provisioner_addr);
+    UINT16_TO_STREAM(p, p_data->addr);
+    UINT8_TO_STREAM(p, p_data->connected);
+    UINT8_TO_STREAM(p, p_data->over_gatt);
+
+    mesh_transport_send_data(HCI_CONTROL_MESH_EVENT_PROXY_CONNECTION_STATUS, (uint8_t *)p_hci_event, (uint16_t)(p - (uint8_t *)p_hci_event));
 }
 
 void mesh_provisioner_hci_event_proxy_filter_status_send(wiced_bt_mesh_hci_event_t *p_hci_event, wiced_bt_mesh_proxy_filter_status_data_t *p_data)

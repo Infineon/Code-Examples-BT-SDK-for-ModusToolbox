@@ -58,7 +58,8 @@ CY_SHOW_NEW_PROJECT := true
 # Use ENABLE_DIGITAL_MIC=1 to enable digital microphone
 # Use ENABLE_IR=1 to enable IR support
 # Use ENABLE_MOTION=1 to enable motion
-# Use OPUS_CELT_ENCODER=1 to use OPUS CELT encoder (else default is mSBC)
+# Use OPUS_CELT_ENCODER=1 to use OPUS CELT encoder, or
+# Use ADPCM_ENCODER=1 to use ACPCM encoder, else default is mSBC
 # Use AUTO_RECONNECT=1 to automatically reconnect when connection drops
 # Use SKIP_PARAM_UPDATE=1 to not request connection parameter update immediately when
 # received LE conn param update complete event with non-preferred values
@@ -82,6 +83,7 @@ ENABLE_DIGITAL_MIC_DEFAULT=0
 ENABLE_IR_DEFAULT=0
 ENABLE_MOTION_DEFAULT=0
 OPUS_CELT_ENCODER_DEFAULT=0
+ADPCM_ENCODER_DEFAULT=0
 AUTO_RECONNECT_DEFAULT=0
 SKIP_PARAM_UPDATE_DEFAULT=1
 ENABLE_EASY_PAIR_DEFAULT=0
@@ -103,6 +105,7 @@ ENABLE_DIGITAL_MIC ?= $(ENABLE_DIGITAL_MIC_DEFAULT)
 ENABLE_IR ?= $(ENABLE_IR_DEFAULT)
 ENABLE_MOTION ?= $(ENABLE_MOTION_DEFAULT)
 OPUS_CELT_ENCODER ?= $(OPUS_CELT_ENCODER_DEFAULT)
+ADPCM_ENCODER ?= $(ADPCM_ENCODER_DEFAULT)
 AUTO_RECONNECT ?= $(AUTO_RECONNECT_DEFAULT)
 SKIP_PARAM_UPDATE ?= $(SKIP_PARAM_UPDATE_DEFAULT)
 ENABLE_EASY_PAIR ?= $(ENABLE_EASY_PAIR_DEFAULT)
@@ -126,6 +129,7 @@ APP_FEATURES= \
     ENABLE_IR,app,enum,$(ENABLE_IR_DEFAULT),0,1 \
     ENABLE_MOTION,app,enum,$(ENABLE_MOTION_DEFAULT),0,1 \
     OPUS_CELT_ENCODER,app,enum,$(OPUS_CELT_ENCODER_DEFAULT),0,1 \
+    ADPCM_ENCODER,app,enum,$(ADPCM_ENCODER_DEFAULT),0,1 \
     AUTO_RECONNECT,app,enum,$(AUTO_RECONNECT_DEFAULT),0,1 \
     SKIP_PARAM_UPDATE,app,enum,$(SKIP_PARAM_UPDATE_DEFAULT),0,1 \
     ENABLE_EASY_PAIR,app,enum,$(ENABLE_EASY_PAIR_DEFAULT),0,1 \
@@ -164,9 +168,15 @@ ifeq ($(OPUS_CELT_ENCODER), 1)
   CY_APP_PATCH_LIBS += celt_lib.a
  endif
 else
+ ifeq ($(ADPCM_ENCODER), 1)
+  CY_APP_DEFINES += -DADPCM_ENCODER
+  CY_APP_PATCH_LIBS += adpcm_lib.a
+ else
  #use mSBC encoder
  CY_APP_DEFINES += -DSBC_ENCODER
- CY_APP_DEFINES += -DSFLASH_SIZE_2M_BITS
+ #enabled only if 256 Kbyte/2M Bit Sflash is used; default is 512 Kbyte/4M Bit Sflash
+ #CY_APP_DEFINES += -DSFLASH_SIZE_2M_BITS
+ endif
 endif
 ifeq ($(SKIP_PARAM_UPDATE),1)
 CY_APP_DEFINES += -DSKIP_CONNECT_PARAM_UPDATE_EVEN_IF_NO_PREFERED
@@ -180,7 +190,7 @@ ifeq ($(ENABLE_AUDIO),1)
  CY_APP_DEFINES += -DATT_MTU_SIZE_180
  #enabled audio enhancement
  CY_APP_DEFINES += -DENABLE_ADC_AUDIO_ENHANCEMENTS
- ifeq ($(PLATFORM),CYW920819EVB-02)
+ ifneq ($(filter CYW920819EVB-02 CYW920820EVB-02 CYBT-213043-EVAL,$(PLATFORM)),)
   CY_APP_PATCH_LIBS += adc_audio_lib.a
  endif
 endif # ENABLE_AUDIO
@@ -218,7 +228,6 @@ CY_APP_DEFINES += -DOTA_SKIP_CONN_PARAM_UPDATE
 
 CY_MAINAPP_SWCOMP_USED += \
   $(CY_WICED_LIB_COMP_BASE)/BT-SDK/common/libraries/fw_upgrade_lib
-
 endif # OTA_FW_UPGRADE
 
 # NOTE: This variable cannot be renamed or moved to a different file. It is updated by the ModusToolbox
@@ -226,11 +235,9 @@ endif # OTA_FW_UPGRADE
 CY_MAINAPP_SWCOMP_EXT =
 
 CY_APP_SOURCE = \
-  ./appDefs.h \
   ./appinit_ble_remote.c \
   ./ble_remote.c \
   ./ble_remote.h \
-  ./ble_remote_gatts.c \
   ./ble_remote_gatts.h \
   ./i2cDevice.c \
   ./i2cDevice.h \
