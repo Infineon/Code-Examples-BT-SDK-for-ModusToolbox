@@ -1,0 +1,1 @@
+For all BT SDK sample applications, including Mesh Peer-apps, please use the version located here on the BT SDK GIT repository: https://github.com/cypresssemiconductorco/Code-Examples-BT-SDK-for-ModusToolbox as opposed to the versions that are installed as part of the BT SDK install process.
