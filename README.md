@@ -15,7 +15,7 @@ Apps in the 'demo' folder are reference applications and more complex in nature.
 
 ModusToolbox 1.1 can be installed from this link: https://community.cypress.com/community/modustoolbox
 
-The Mesh-Peer-Apps folder contain peer application for Mesh applications. Up to date Mesh Peer Apps are located here. Use these apps as opposed to the versions that are installed as part of the BT SDK install process. Copy and replace them in <Install Path>\ModusToolbox_1.1\libraries\bt_sdk-1.1\components\BT-SDK\common\apps\snip\mesh\peerapps
+The Mesh-Peer-Apps folder contain peer application for Mesh applications. Up to date Mesh Peer Apps are located here. Use these apps as opposed to the versions that are installed as part of the BT SDK install process. Copy and replace them in 'Install Path'\ModusToolbox_1.1\libraries\bt_sdk-1.1\components\BT-SDK\common\apps\snip\mesh\peerapps
 
 ## Adding the Code Example to the IDE
 
