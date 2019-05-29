@@ -1,1 +1,1 @@
-For all BT SDK sample applications, including Mesh Peer-apps, please use the version located here on the BT SDK GIT repository: https://github.com/cypresssemiconductorco/Code-Examples-BT-SDK-for-ModusToolbox as opposed to the versions that are installed as part of the BT SDK install process.
+Up to date Mesh Peer Apps are located here. Use these apps as opposed to the versions that are installed as part of the BT SDK install process. Copy and replace them in <Install Path>\ModusToolbox_1.1\libraries\bt_sdk-1.1\components\BT-SDK\common\apps\snip\mesh\peerapps
