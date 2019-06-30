@@ -42,14 +42,12 @@ CY_EXAMPLE_DESCRIPTION =  This application demonstrates how to use SPI driver in
 
 CY_SHOW_NEW_PROJECT := true
 
-CY_REQUIRED_SDK = Cypress SDK[1.0]
-
 CY_VALID_PLATFORMS = CYW920820EVB-02
 
 PLATFORM = CYW920820EVB-02
 
 # NOTE: This variable cannot be renamed or moved to a different file. It is updated by the
-#ModusToolbox middleware editor.
+# ModusToolbox middleware editor.
 CY_MAINAPP_SWCOMP_EXT =
 
 CY_APP_DEFINES = -DWICED_BT_TRACE_ENABLE \
@@ -58,15 +56,17 @@ CY_APP_SOURCE =  \
   ./readme.txt \
   ./spi_slave_thermistor.c \
   ./thermistor_temp_db.c \
-  ./thermistor_temp_db.h \
-  ./wiced_platform.h \
-  ./design.modus \
-  ./GeneratedSource/cycfg_pins.h \
-  ./GeneratedSource/cycfg_pins.c
+  ./thermistor_temp_db.h
+
+# if app needs to use custom design.modus, define path here, needs to match same structure
+# as main app but under components not examples
+CY_APP_COMPONENT_PATH_BASE := 208XX-A1_Bluetooth/apps/demo/datalogger/spi_slave_sensor
 
 CY_APP_RESOURCES =
 
+# declare local directory for include path
 CY_APP_PATH := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+# handle cygwin drive/path mangling for GNU tools - replace /cygdrive/c/ with c:/
 ifneq ($(findstring cygdrive,$(CY_APP_PATH)),)
 CY_APP_PATH := $(subst /, ,$(patsubst /cygdrive/%,%,$(CY_APP_PATH)))
 CY_APP_PATH := $(subst $(empty) $(empty),/,$(patsubst %,%:,$(firstword $(CY_APP_PATH))) $(wordlist 2,$(words $(CY_APP_PATH)),$(CY_APP_PATH)))

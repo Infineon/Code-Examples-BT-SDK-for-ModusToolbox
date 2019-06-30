@@ -54,7 +54,7 @@
 /* *******************************************************************
  *                              CONSTANTS
  * *******************************************************************/
-#define CONNECTION_LED                  WICED_GET_PIN_FOR_LED(2)
+#define CONNECTION_LED                  WICED_GET_PIN_FOR_LED(WICED_PLATFORM_LED_2)
 
 /* *******************************************************************
  *                              VARIABLES

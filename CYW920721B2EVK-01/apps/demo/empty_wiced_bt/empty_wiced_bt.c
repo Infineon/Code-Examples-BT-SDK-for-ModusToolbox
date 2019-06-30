@@ -85,7 +85,7 @@ void application_start(void)
         wiced_set_debug_uart(  WICED_ROUTE_DEBUG_TO_PUART );
     #endif
 
-    WICED_BT_TRACE("**** CYW20819 App Start **** \n\r");
+    WICED_BT_TRACE("**** App Start **** \n\r");
 
     /* TODO your app init code */
 

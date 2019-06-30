@@ -107,7 +107,6 @@
 // If secure version of the OTA firmware upgrade is used, the app should be linked with the ecdsa256_pub.c
 // which exports the public key
 extern Point    ecdsa256_public_key;
-static uint8_t  ota_fw_upgrade_initialized = WICED_FALSE;
 #endif
 
 /******************************************************************************

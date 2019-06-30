@@ -46,29 +46,103 @@
 #include "wiced_bt_trace.h"
 #include "wiced_transport.h"
 #include "hci_control_api.h"
-#include "mesh_vendor_server.h"
 #include "wiced_bt_mesh_client.h"
 #include "wiced_memory.h"
 
 #include "wiced_bt_cfg.h"
 extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
 
+uint32_t mesh_default_transition_time_proc_rx_cmd(uint16_t opcode, uint8_t* p_data, uint32_t length);
+extern void mesh_default_transition_time_client_message_handler(uint16_t event, wiced_bt_mesh_event_t* p_event, void* p_data);
+
+#ifdef WICED_BT_MESH_MODEL_PROPERTY_CLIENT_INCLUDED
+uint32_t mesh_property_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
+extern void mesh_property_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
+#endif
+
+#ifdef WICED_BT_MESH_MODEL_BATTERY_CLIENT_INCLUDED
+uint32_t mesh_battery_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
+extern void mesh_battery_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, mesh_battery_event_t *p_data);
+#endif
+
+#ifdef WICED_BT_MESH_MODEL_LIGHT_LC_CLIENT_INCLUDED
+uint32_t mesh_light_lc_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
+extern void mesh_light_lc_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
+#endif
+
+#ifdef WICED_BT_MESH_MODEL_LIGHT_XYL_CLIENT_INCLUDED
+uint32_t mesh_light_xyl_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
+extern void mesh_light_xyl_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
+#endif
+
+#ifdef WICED_BT_MESH_MODEL_LOCATION_CLIENT_INCLUDED
+uint32_t mesh_location_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
+extern void mesh_location_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
+#endif
+
+#ifdef WICED_BT_MESH_MODEL_POWER_LEVEL_CLIENT_INCLUDED
+uint32_t mesh_power_level_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
+extern void mesh_power_level_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
+#endif
+
+#ifdef WICED_BT_MESH_MODEL_POWER_ONOFF_CLIENT_INCLUDED
+uint32_t mesh_power_onoff_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
+extern void mesh_power_onoff_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
+#endif
+
+#ifdef WICED_BT_MESH_MODEL_SCHEDULER_CLIENT_INCLUDED
+uint32_t mesh_scheduler_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
+extern void mesh_scheduler_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
+#endif
+
+#ifdef WICED_BT_MESH_MODEL_TIME_CLIENT_INCLUDED
+uint32_t mesh_time_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
+extern void mesh_time_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
+#endif
+
+#ifdef WICED_BT_MESH_MODEL_ONOFF_CLIENT_INCLUDED
 uint32_t mesh_onoff_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
+extern void mesh_onoff_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
+#endif
+
+#ifdef WICED_BT_MESH_MODEL_LEVEL_CLIENT_INCLUDED
 uint32_t mesh_level_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
+extern void mesh_level_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, wiced_bt_mesh_level_status_data_t *p_data);
+#endif
+
+#ifdef WICED_BT_MESH_MODEL_LIGHT_LIGHTNESS_CLIENT_INCLUDED
 uint32_t mesh_light_lightness_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
+extern void mesh_light_lightness_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
+#endif
+
+#ifdef WICED_BT_MESH_MODEL_LIGHT_HSL_CLIENT_INCLUDED
 uint32_t mesh_light_hsl_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
+extern void mesh_light_hsl_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
+#endif
+
+#ifdef WICED_BT_MESH_MODEL_LIGHT_CTL_CLIENT_INCLUDED
 uint32_t mesh_light_ctl_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
-uint32_t mesh_default_transition_time_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
+extern void mesh_light_ctl_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
+#endif
+
+#ifdef WICED_BT_MESH_MODEL_SENSOR_CLIENT_INCLUDED
 uint32_t mesh_sensor_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
+extern void mesh_sensor_client_message_handler(uint8_t element_idx, uint16_t addr, uint16_t event, void *p_data);
+#endif
+
+#ifdef WICED_BT_MESH_MODEL_SCENE_CLIENT_INCLUDED
 uint32_t mesh_scene_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
-uint32_t mesh_vendor_service_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
+extern void mesh_scene_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
+#endif
+
+uint32_t mesh_vendor_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
 wiced_bool_t mesh_gatt_client_local_device_set(wiced_bt_mesh_local_device_set_data_t *p_data);
 
 /******************************************************
  *          Constants
  ******************************************************/
 #define MESH_PID                0x301D
-#define MESH_VID                0x0001
+#define MESH_VID                0x0002
 #define MESH_FWID               0x301D000101010001
 #define MESH_CACHE_REPLAY_SIZE  200
 
@@ -194,26 +268,68 @@ uint8_t mesh_system_id[8]                                                  = { 0
 
 extern wiced_transport_buffer_pool_t* host_trans_pool;
 
-wiced_bool_t mesh_vendor_server_message_handler(wiced_bt_mesh_event_t *p_event, uint8_t *p_data, uint16_t data_len);
-uint16_t     mesh_vendor_server_scene_store_handler(uint8_t element_idx, uint8_t *p_buffer, uint16_t buffer_len);
-uint16_t     mesh_vendor_server_scene_recall_handler(uint8_t element_idx, uint8_t *p_buffer, uint16_t buffer_len, uint32_t transition_time, uint32_t delay);
+wiced_bool_t mesh_vendor_client_message_handler(wiced_bt_mesh_event_t *p_event, const uint8_t *p_data, uint16_t data_len);
 
 wiced_bt_mesh_core_config_model_t   mesh_element1_models[] =
 {
     WICED_BT_MESH_DEVICE,
+
+#ifdef WICED_BT_MESH_MODEL_PROPERTY_CLIENT_INCLUDED
+    WICED_BT_MESH_MODEL_PROPERTY_CLIENT,
+#endif
+#ifdef WICED_BT_MESH_MODEL_BATTERY_CLIENT_INCLUDED
+    WICED_BT_MESH_MODEL_BATTERY_CLIENT,
+#endif
+#ifdef WICED_BT_MESH_MODEL_LIGHT_LC_CLIENT_INCLUDED
+    WICED_BT_MESH_MODEL_LIGHT_LC_CLIENT,
+#endif
+#ifdef WICED_BT_MESH_MODEL_LIGHT_XYL_CLIENT_INCLUDED
+    WICED_BT_MESH_MODEL_LIGHT_XYL_CLIENT,
+#endif
+#ifdef WICED_BT_MESH_MODEL_LOCATION_CLIENT_INCLUDED
+    WICED_BT_MESH_MODEL_LOCATION_CLIENT,
+#endif
+#ifdef WICED_BT_MESH_MODEL_POWER_LEVEL_CLIENT_INCLUDED
+    WICED_BT_MESH_MODEL_POWER_LEVEL_CLIENT,
+#endif
+#ifdef WICED_BT_MESH_MODEL_POWER_ONOFF_CLIENT_INCLUDED
+    WICED_BT_MESH_MODEL_POWER_ONOFF_CLIENT,
+#endif
+#ifdef WICED_BT_MESH_MODEL_SCHEDULER_CLIENT_INCLUDED
+    WICED_BT_MESH_MODEL_SCHEDULER_CLIENT,
+#endif
+#ifdef WICED_BT_MESH_MODEL_TIME_CLIENT_INCLUDED
+    WICED_BT_MESH_MODEL_TIME_CLIENT,
+#endif
     WICED_BT_MESH_MODEL_CONFIG_CLIENT,
     WICED_BT_MESH_MODEL_HEALTH_CLIENT,
     WICED_BT_MESH_MODEL_REMOTE_PROVISION_SERVER,
     WICED_BT_MESH_MODEL_REMOTE_PROVISION_CLIENT,
     WICED_BT_MESH_MODEL_DEFAULT_TRANSITION_TIME_CLIENT,
+#ifdef WICED_BT_MESH_MODEL_SENSOR_CLIENT_INCLUDED
     WICED_BT_MESH_MODEL_SENSOR_CLIENT,
+#endif
+#ifdef WICED_BT_MESH_MODEL_SCENE_CLIENT_INCLUDED
     WICED_BT_MESH_MODEL_SCENE_CLIENT,
+#endif
+#ifdef WICED_BT_MESH_MODEL_ONOFF_CLIENT_INCLUDED
     WICED_BT_MESH_MODEL_ONOFF_CLIENT,
+#endif
+#ifdef WICED_BT_MESH_MODEL_LEVEL_CLIENT_INCLUDED
     WICED_BT_MESH_MODEL_LEVEL_CLIENT,
+#endif
+#ifdef WICED_BT_MESH_MODEL_LIGHT_LIGHTNESS_CLIENT_INCLUDED
     WICED_BT_MESH_MODEL_LIGHT_LIGHTNESS_CLIENT,
+#endif
+#ifdef WICED_BT_MESH_MODEL_LIGHT_CTL_CLIENT_INCLUDED
     WICED_BT_MESH_MODEL_LIGHT_CTL_CLIENT,
+#endif
+#ifdef WICED_BT_MESH_MODEL_LIGHT_HSL_CLIENT_INCLUDED
     WICED_BT_MESH_MODEL_LIGHT_HSL_CLIENT,
-    { MESH_VENDOR_COMPANY_ID, MESH_VENDOR_MODEL_ID, mesh_vendor_server_message_handler, mesh_vendor_server_scene_store_handler, mesh_vendor_server_scene_recall_handler },
+#endif
+    // This a client which assume to know all the keys, so we will allow
+    // vendor commands from all the companies.
+    { MESH_COMPANY_ID_UNUSED, 0, mesh_vendor_client_message_handler, NULL, NULL },
 };
 #define MESH_APP_NUM_MODELS  (sizeof(mesh_element1_models) / sizeof(wiced_bt_mesh_core_config_model_t))
 
@@ -280,15 +396,6 @@ wiced_bt_mesh_app_func_table_t wiced_bt_mesh_app_func_table =
     NULL                    // factory reset
 };
 
-extern void mesh_onoff_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
-extern void mesh_scene_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
-extern void mesh_level_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, wiced_bt_mesh_level_status_data_t *p_data);
-extern void mesh_light_lightness_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
-extern void mesh_light_ctl_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
-extern void mesh_light_hsl_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
-extern void mesh_default_transition_time_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_event, void *p_data);
-extern void mesh_sensor_client_message_handler(uint8_t element_idx, uint16_t addr, uint16_t event, void *p_data);
-
 // This application is the only one that can connect to the mesh over proxy and
 // need to process proxy status messages.  It needs to fill the pointer in the mesh_application.c.
 extern void *p_proxy_status_message_handler;
@@ -350,14 +457,56 @@ void mesh_app_init(wiced_bool_t is_provisioned)
     wiced_bt_mesh_health_client_init(mesh_config_client_message_handler, is_provisioned);
     wiced_bt_mesh_proxy_client_init(mesh_config_client_message_handler, is_provisioned);
 
-    wiced_bt_mesh_model_onoff_client_init(0, mesh_onoff_client_message_handler, is_provisioned);
-    wiced_bt_mesh_model_level_client_init(0, mesh_level_client_message_handler, is_provisioned);
-    wiced_bt_mesh_model_light_lightness_client_init(0, mesh_light_lightness_client_message_handler, is_provisioned);
-    wiced_bt_mesh_model_light_ctl_client_init(0, mesh_light_ctl_client_message_handler, is_provisioned);
-    wiced_bt_mesh_model_light_hsl_client_init(0, mesh_light_hsl_client_message_handler, is_provisioned);
     wiced_bt_mesh_model_default_transition_time_client_init(0, mesh_default_transition_time_client_message_handler, is_provisioned);
+
+#ifdef WICED_BT_MESH_MODEL_ONOFF_CLIENT_INCLUDED
+    wiced_bt_mesh_model_onoff_client_init(0, mesh_onoff_client_message_handler, is_provisioned);
+#endif
+#ifdef WICED_BT_MESH_MODEL_LEVEL_CLIENT_INCLUDED
+    wiced_bt_mesh_model_level_client_init(0, mesh_level_client_message_handler, is_provisioned);
+#endif
+#ifdef WICED_BT_MESH_MODEL_LIGHT_LIGHTNESS_CLIENT_INCLUDED
+    wiced_bt_mesh_model_light_lightness_client_init(0, mesh_light_lightness_client_message_handler, is_provisioned);
+#endif
+#ifdef WICED_BT_MESH_MODEL_LIGHT_CTL_CLIENT_INCLUDED
+    wiced_bt_mesh_model_light_ctl_client_init(0, mesh_light_ctl_client_message_handler, is_provisioned);
+#endif
+#ifdef WICED_BT_MESH_MODEL_LIGHT_HSL_CLIENT_INCLUDED
+    wiced_bt_mesh_model_light_hsl_client_init(0, mesh_light_hsl_client_message_handler, is_provisioned);
+#endif
+#ifdef WICED_BT_MESH_MODEL_SENSOR_CLIENT_INCLUDED
     wiced_bt_mesh_model_sensor_client_init(0, mesh_sensor_client_message_handler, is_provisioned);
+#endif
+#ifdef WICED_BT_MESH_MODEL_SCENE_CLIENT_INCLUDED
     wiced_bt_mesh_model_scene_client_init(0, mesh_scene_client_message_handler, is_provisioned);
+#endif
+#ifdef WICED_BT_MESH_MODEL_PROPERTY_CLIENT_INCLUDED
+    wiced_bt_mesh_model_property_client_init(0, mesh_property_client_message_handler, is_provisioned);
+#endif
+#ifdef WICED_BT_MESH_MODEL_BATTERY_CLIENT_INCLUDED
+    wiced_bt_mesh_model_battery_client_init(mesh_battery_client_message_handler, is_provisioned);
+#endif
+#ifdef WICED_BT_MESH_MODEL_LIGHT_LC_CLIENT_INCLUDED
+    wiced_bt_mesh_model_light_lc_client_init(0, mesh_light_lc_client_message_handler, is_provisioned);
+#endif
+#ifdef WICED_BT_MESH_MODEL_LIGHT_XYL_CLIENT_INCLUDED
+    wiced_bt_mesh_model_light_xyl_client_init(0, mesh_light_xyl_client_message_handler, is_provisioned);
+#endif
+#ifdef WICED_BT_MESH_MODEL_LOCATION_CLIENT_INCLUDED
+    wiced_bt_mesh_model_location_client_init(mesh_location_client_message_handler, is_provisioned);
+#endif
+#ifdef WICED_BT_MESH_MODEL_POWER_LEVEL_CLIENT_INCLUDED
+    wiced_bt_mesh_model_power_level_client_init(0, mesh_power_level_client_message_handler, is_provisioned);
+#endif
+#ifdef WICED_BT_MESH_MODEL_POWER_ONOFF_CLIENT_INCLUDED
+    wiced_bt_mesh_model_power_onoff_client_init(0, mesh_power_onoff_client_message_handler, is_provisioned);
+#endif
+#ifdef WICED_BT_MESH_MODEL_SCHEDULER_CLIENT_INCLUDED
+    wiced_bt_mesh_model_scheduler_client_init(mesh_scheduler_client_message_handler, is_provisioned);
+#endif
+#ifdef WICED_BT_MESH_MODEL_TIME_CLIENT_INCLUDED
+    wiced_bt_mesh_model_time_client_init(mesh_time_client_message_handler, is_provisioned);
+#endif
 
     p_proxy_status_message_handler = mesh_proxy_client_process_filter_status;
 }
@@ -583,15 +732,57 @@ uint32_t mesh_app_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length)
 
     WICED_BT_TRACE("%s opcode:%x\n", __FUNCTION__, opcode);
 
-    if (mesh_onoff_client_proc_rx_cmd(opcode, p_data, length) ||
-        mesh_level_client_proc_rx_cmd(opcode, p_data, length) ||
-        mesh_light_lightness_client_proc_rx_cmd(opcode, p_data, length) ||
-        mesh_light_hsl_client_proc_rx_cmd(opcode, p_data, length) ||
-        mesh_light_ctl_client_proc_rx_cmd(opcode, p_data, length) ||
+    if (
         mesh_default_transition_time_proc_rx_cmd(opcode, p_data, length) ||
+#ifdef WICED_BT_MESH_MODEL_PROPERTY_CLIENT_INCLUDED
+       mesh_property_client_proc_rx_cmd(opcode, p_data, length) ||
+#endif
+#ifdef WICED_BT_MESH_MODEL_BATTERY_CLIENT_INCLUDED
+       mesh_battery_client_proc_rx_cmd(opcode, p_data, length) ||
+#endif
+#ifdef WICED_BT_MESH_MODEL_LIGHT_LC_CLIENT_INCLUDED
+       mesh_light_lc_client_proc_rx_cmd(opcode, p_data, length) ||
+#endif
+#ifdef WICED_BT_MESH_MODEL_LIGHT_XYL_CLIENT_INCLUDED
+       mesh_light_xyl_client_proc_rx_cmd(opcode, p_data, length) ||
+#endif
+#ifdef WICED_BT_MESH_MODEL_LOCATION_CLIENT_INCLUDED
+       mesh_location_client_proc_rx_cmd(opcode, p_data, length) ||
+#endif
+#ifdef WICED_BT_MESH_MODEL_POWER_LEVEL_CLIENT_INCLUDED
+       mesh_power_level_client_proc_rx_cmd(opcode, p_data, length) ||
+#endif
+#ifdef WICED_BT_MESH_MODEL_POWER_ONOFF_CLIENT_INCLUDED
+       mesh_power_onoff_client_proc_rx_cmd(opcode, p_data, length) ||
+#endif
+#ifdef WICED_BT_MESH_MODEL_SCHEDULER_CLIENT_INCLUDED
+        mesh_scheduler_client_proc_rx_cmd(opcode, p_data, length) ||
+#endif
+#ifdef WICED_BT_MESH_MODEL_TIME_CLIENT_INCLUDED
+        mesh_time_client_proc_rx_cmd(opcode, p_data, length) ||
+#endif
+#ifdef WICED_BT_MESH_MODEL_ONOFF_CLIENT_INCLUDED
+        mesh_onoff_client_proc_rx_cmd(opcode, p_data, length) ||
+#endif
+#ifdef WICED_BT_MESH_MODEL_LEVEL_CLIENT_INCLUDED
+        mesh_level_client_proc_rx_cmd(opcode, p_data, length) ||
+#endif
+#ifdef WICED_BT_MESH_MODEL_LIGHT_LIGHTNESS_CLIENT_INCLUDED
+        mesh_light_lightness_client_proc_rx_cmd(opcode, p_data, length) ||
+#endif
+#ifdef WICED_BT_MESH_MODEL_LIGHT_HSL_CLIENT_INCLUDED
+        mesh_light_hsl_client_proc_rx_cmd(opcode, p_data, length) ||
+#endif
+#ifdef WICED_BT_MESH_MODEL_LIGHT_CTL_CLIENT_INCLUDED
+        mesh_light_ctl_client_proc_rx_cmd(opcode, p_data, length) ||
+#endif
+#ifdef WICED_BT_MESH_MODEL_SENSOR_CLIENT_INCLUDED
         mesh_sensor_client_proc_rx_cmd(opcode, p_data, length) ||
+#endif
+#ifdef WICED_BT_MESH_MODEL_SCENE_CLIENT_INCLUDED
         mesh_scene_client_proc_rx_cmd(opcode, p_data, length) ||
-        mesh_vendor_service_proc_rx_cmd(opcode, p_data, length))
+#endif
+        mesh_vendor_client_proc_rx_cmd(opcode, p_data, length))
         return WICED_TRUE;
 
     switch (opcode)
@@ -1007,6 +1198,8 @@ uint8_t mesh_provisioner_process_set_local_device(uint8_t *p_data, uint32_t leng
     mesh_gatt_client_local_device_set(&set);
     mesh_app_init(WICED_TRUE);
 
+    // Application can register to receive all raw model messages.
+    // if not, this application wants to process all vendor specific messages
     if (model_level_access)
     {
         extern wiced_bt_mesh_core_received_msg_handler_t p_app_model_message_handler;
@@ -1050,9 +1243,14 @@ uint8_t mesh_provisioner_process_scan_get(wiced_bt_mesh_event_t *p_event, uint8_
 uint8_t mesh_provisioner_process_scan_start(wiced_bt_mesh_event_t *p_event, uint8_t *p_data, uint32_t length)
 {
     wiced_bt_mesh_provision_scan_start_data_t data;
-
+    memset(&data, 0, sizeof(data));
     STREAM_TO_UINT8(data.scanned_items_limit, p_data);
     STREAM_TO_UINT8(data.timeout, p_data);
+    if (length >= 2 + MESH_DEVICE_UUID_LEN)
+    {
+        data.scan_single_uuid = WICED_TRUE;
+        memcpy(data.uuid, p_data, MESH_DEVICE_UUID_LEN);
+    }
     return wiced_bt_mesh_provision_scan_start(p_event, &data) ? HCI_CONTROL_MESH_STATUS_SUCCESS : HCI_CONTROL_MESH_STATUS_ERROR;
 }
 
@@ -1065,25 +1263,25 @@ uint8_t mesh_provisioner_process_extended_scan_start(wiced_bt_mesh_event_t *p_ev
     int i;
 
     memset(&data, 0, sizeof(data));
-    STREAM_TO_UINT8(data.timeout, p_data);
+    STREAM_TO_UINT8(data.num_ad_filters, p_data);
     length -= 1;
 
-    for (i = 0; (i < WICED_BT_MESH_AD_FILTER_TYPES_MAX) && (length > 0); i++)
+    for (i = 0; (i < data.num_ad_filters) && (i < WICED_BT_MESH_AD_FILTER_TYPES_MAX) && (length > 0); i++)
     {
-        data.ad_filter_types[i] = *p_data++;
+        STREAM_TO_UINT8(data.ad_filter_types[i], p_data);
         length--;
-        if (data.ad_filter_types[i] == 0)
-            break;
     }
-    if ((length != 16) && (length != 0))
+    if ((length != 17) && (length != 0))
     {
         WICED_BT_TRACE("ext scan start len:%d\n", length);
         return WICED_FALSE;
     }
-    if (length == 16)
+    if (length == 17)
     {
         data.uuid_present = WICED_TRUE;
         memcpy(data.uuid, p_data, 16);
+        p_data += 16;
+        STREAM_TO_UINT8(data.timeout, p_data);
     }
     return wiced_bt_mesh_provision_scan_extended_start(p_event, &data) ? HCI_CONTROL_MESH_STATUS_SUCCESS : HCI_CONTROL_MESH_STATUS_ERROR;
 }
@@ -1106,6 +1304,7 @@ uint8_t mesh_provisioner_process_connect(wiced_bt_mesh_event_t *p_event, uint8_t
 
     STREAM_TO_ARRAY(connect.uuid, p_data, 16);
     STREAM_TO_UINT8(connect.identify_duration, p_data);
+    STREAM_TO_UINT8(connect.procedure, p_data);
     STREAM_TO_UINT8(use_pb_gatt, p_data);
 
     return wiced_bt_mesh_provision_connect(p_event, &connect, use_pb_gatt)  ? HCI_CONTROL_MESH_STATUS_SUCCESS : HCI_CONTROL_MESH_STATUS_ERROR;
@@ -1727,10 +1926,9 @@ void mesh_provisioner_hci_event_scan_status_send(wiced_bt_mesh_hci_event_t *p_hc
     uint8_t *p = p_hci_event->data;
 
     UINT8_TO_STREAM(p, p_data->status);
-    UINT8_TO_STREAM(p, p_data->phase);
+    UINT8_TO_STREAM(p, p_data->state);
     UINT8_TO_STREAM(p, p_data->scanned_items_limit);
     UINT8_TO_STREAM(p, p_data->timeout);
-    UINT8_TO_STREAM(p, p_data->scanning_type);
 
     mesh_transport_send_data(HCI_CONTROL_MESH_EVENT_PROVISION_SCAN_STATUS, (uint8_t *)p_hci_event, (uint16_t)(p - (uint8_t *)p_hci_event));
 }

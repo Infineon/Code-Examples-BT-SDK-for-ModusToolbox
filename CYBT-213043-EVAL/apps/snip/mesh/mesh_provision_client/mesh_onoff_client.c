@@ -36,6 +36,9 @@
  *
  * This file shows how to create a device which implements mesh on/off client model.
  */
+
+#ifdef WICED_BT_MESH_MODEL_ONOFF_CLIENT_INCLUDED
+
 #include "wiced_bt_ble.h"
 #include "wiced_bt_gatt.h"
 #include "wiced_bt_mesh_models.h"
@@ -188,4 +191,6 @@ void mesh_onoff_hci_event_send(wiced_bt_mesh_hci_event_t *p_hci_event, wiced_bt_
 
     mesh_transport_send_data(HCI_CONTROL_MESH_EVENT_ONOFF_STATUS, (uint8_t *)p_hci_event, (uint16_t)(p - (uint8_t *)p_hci_event));
 }
+#endif
+
 #endif

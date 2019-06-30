@@ -36,7 +36,6 @@
 #include "brcm_fw_types.h"
 #include "IQS5xx.h"
 #include "../interrupt.h"
-#include "appDefs.h"
 #include "wiced_bt_trace.h"
 #include "ble_remote.h"
 

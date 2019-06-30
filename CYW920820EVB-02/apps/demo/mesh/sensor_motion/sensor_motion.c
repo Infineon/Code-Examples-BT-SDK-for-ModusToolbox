@@ -70,13 +70,14 @@
 #include "e93196.h"
 #include "wiced_sleep.h"
 #include "wiced_bt_cfg.h"
+#include "wiced_hal_mia.h"
 extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
 
 /******************************************************
  *          Constants
  ******************************************************/
 #define MESH_PID                0x3123
-#define MESH_VID                0x0001
+#define MESH_VID                0x0002
 #define MESH_FWID               0x3123000101010001
 
 #define MESH_CACHE_REPLAY_SIZE  0x0008
@@ -306,6 +307,27 @@ void mesh_app_init(wiced_bool_t is_provisioned)
 #endif
     wiced_result_t result;
     wiced_bt_mesh_core_config_sensor_t *p_sensor;
+
+    /* This means that device came out of HID off mode and it is not a power cycle */
+    if(wiced_hal_mia_is_reset_reason_por())
+    {
+        WICED_BT_TRACE("start reason: reset\n");
+    }
+    else
+    {
+#if CYW20819A1
+        if(wiced_hal_mia_is_reset_reason_hid_timeout())
+        {
+            WICED_BT_TRACE("Wake from HID off: timed wake\n");
+        }
+        else
+#endif
+        {
+            /* We woke up from hid-off, need to check if we woke because of GPIO */
+            WICED_BT_TRACE("Wake from HID off, interrupt:%d\n",
+                wiced_hal_gpio_get_pin_interrupt_status(e93196_usr_cfg.doci_pin));
+        }
+    }
 
 #if defined(LOW_POWER_NODE) && (LOW_POWER_NODE == 1)
     wiced_bt_cfg_settings.device_name = (uint8_t *)"Motion Sensor LPN";
@@ -665,6 +687,8 @@ void mesh_app_factory_reset(void)
 #if defined(LOW_POWER_NODE) && (LOW_POWER_NODE == 1)
 void mesh_sensor_motion_lpn_sleep(uint32_t max_sleep_duration)
 {
-    // Motion Sensor Low power sleep functionality is not implemented in this example code
+    WICED_BT_TRACE("Entering HID-OFF for max_sleep_duration: %ds\r\n", max_sleep_duration/1000);
+    wiced_sleep_enter_hid_off(max_sleep_duration, e93196_usr_cfg.doci_pin, WICED_GPIO_ACTIVE_HIGH);
+    WICED_BT_TRACE("Entering HID-Off failed\n\r");
 }
 #endif

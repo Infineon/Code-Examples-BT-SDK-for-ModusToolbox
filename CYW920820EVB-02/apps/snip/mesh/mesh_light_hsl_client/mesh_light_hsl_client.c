@@ -54,7 +54,7 @@ extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
  *          Constants
  ******************************************************/
 #define MESH_PID                0x3009
-#define MESH_VID                0x0001
+#define MESH_VID                0x0002
 #define MESH_FWID               0x3009000101010001
 #define MESH_CACHE_REPLAY_SIZE  0x0008
 

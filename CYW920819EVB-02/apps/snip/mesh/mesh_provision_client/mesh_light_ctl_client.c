@@ -36,6 +36,9 @@
  *
  * This file shows how to create a device which implements mesh Mesh Light CTL Client.
  */
+
+#ifdef WICED_BT_MESH_MODEL_LIGHT_CTL_CLIENT_INCLUDED
+
 #include "wiced_bt_ble.h"
 #include "wiced_bt_gatt.h"
 #include "wiced_bt_mesh_models.h"
@@ -366,5 +369,7 @@ void mesh_light_ctl_hci_event_send_default_status(wiced_bt_mesh_hci_event_t *p_h
 
     mesh_transport_send_data(HCI_CONTROL_MESH_EVENT_LIGHT_CTL_DEFAULT_STATUS, (uint8_t *)p_hci_event, (uint16_t)(p - (uint8_t *)p_hci_event));
 }
+
+#endif
 
 #endif

@@ -1,21 +1,20 @@
-# Code-Examples-BTSDK-1.2-for-ModusToolbox
+# Code-Examples-BTSDK-1.3-for-ModusToolbox
 
 ## Overview
 These examples demonstrate the functionality of following devices:
 
 - CYW20819A1 chip: CYW920819EVB-02, CYBT-213043-MESH, CYBT-213043-EVAL
-- CYW20820A1 chip: CYW920820EVB-02
+- CYW20820A1 chip: CYW920820EVB-02, CYW989820EVB-01
 - CYW20721B2 chip: CYW920721B2EVK-01
+- CYW20719B2 chip: CYW920719B2Q40EVB-01
 
-Each example has a readme.txt that explains what do and what to observe when running the example. Also review the chip specific readme.txt (208XX_readme.txt and 20721_readme.txt) for an overvivew of the BT SDK features and tools.
+Each example has a readme.txt that explains what do and what to observe when running the example. Also review the chip specific readme.txt for an overvivew of the BT SDK features and tools.
 
-See BT-SDK-1.2-Code-Examples.pdf for details of applications and supported devices.
+See BT-SDK-1.3-Code-Examples.html for details of applications and supported devices.
 
 Apps in the 'demo' folder are reference applications and more complex in nature. Apps in the 'snips' folder demonstrate a specific feature or library. These examples support ModusToolbox v1.1. They do not work with ModusToolbox v1.0.
 
 ModusToolbox 1.1 can be installed from this link: https://community.cypress.com/community/modustoolbox
-
-The Mesh-Peer-Apps folder contain peer application for Mesh applications. Up to date Mesh Peer Apps are located here. Use these apps as opposed to the versions that are installed as part of the BT SDK install process. Copy and replace them in 'Install Path'\ModusToolbox_1.1\libraries\bt_sdk-1.1\components\BT-SDK\common\apps\snip\mesh\peerapps
 
 ## Adding the Code Example to the IDE
 

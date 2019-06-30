@@ -55,7 +55,7 @@ extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
  *          Constants
  ******************************************************/
 #define MESH_PID                0x3008
-#define MESH_VID                0x0001
+#define MESH_VID                0x0002
 #define MESH_FWID               0x3008000101010001
 #define MESH_CACHE_REPLAY_SIZE  0x0008
 
@@ -103,7 +103,7 @@ wiced_bt_mesh_core_config_element_t mesh_elements[] =
         .location = MESH_ELEM_LOC_MAIN,                                 // location description as defined in the GATT Bluetooth Namespace Descriptors section of the Bluetooth SIG Assigned Numbers
         .default_transition_time = MESH_DEFAULT_TRANSITION_TIME_IN_MS,  // Default transition time for models of the element in milliseconds
         .onpowerup_state = WICED_BT_MESH_ON_POWER_UP_STATE_RESTORE,     // Default element behavior on power up
-        .default_level = 1,                                             // Default value of the variable controlled on this element (for example power, lightness, temperature, hue...)
+        .default_level = 0xFFFF,                                        // Default value of the variable controlled on this element (for example power, lightness, temperature, hue...)
         .range_min = 1,                                                 // Minimum value of the variable controlled on this element (for example power, lightness, temperature, hue...)
         .range_max = 0xffff,                                            // Maximum value of the variable controlled on this element (for example power, lightness, temperature, hue...)
         .move_rollover = 0,                                             // If true when level gets to range_max during move operation, it switches to min, otherwise move stops.

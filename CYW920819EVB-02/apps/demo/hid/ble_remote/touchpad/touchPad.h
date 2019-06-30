@@ -43,11 +43,11 @@
 #define __TOUCHPAD_H__
 
 #include "../interrupt.h"
-#include "appDefs.h"
 #include "IQS5xx.h"
 #include "wiced.h"
+#include "hidevent.h"
 
-#define TP_INTERRUPT_GPIO       GPIO_ATTN_TP
+#define TP_INTERRUPT_GPIO       GPIO_TOUCHPAD_INT
 #define TOUCHPAD_FIFO_CNT       46
 #define MAX_TP_EVENT_DELAY_IN_MS    100
 #define STUCK_FINGER_TIMEOUT_mS     200 // 200ms
@@ -66,6 +66,13 @@ enum {
     CLICK_LEFT,
     CLICK_RIGHT,
     CLICK_THRESHOLD = 0x100,
+};
+
+enum {
+    HID_EVENT_TP_INFO = 0x80,
+    HID_EVENT_TP_DATA,
+    HID_EVENT_TP_FINGER_STATUS_CHANGE,
+    HID_EVENT_AVAILABLE,
 };
 
 #pragma pack(1)

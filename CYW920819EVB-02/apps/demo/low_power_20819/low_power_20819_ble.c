@@ -128,7 +128,7 @@ void low_power_20819_app_init(void)
     wiced_real_time_clock_t curr_time;
 
     /* Register for button callback */
-    wiced_platform_register_button_callback(WICED_GPIO_PIN_BUTTON, button_cb, NULL, WICED_GPIO_PIN_BUTTON_TRIGGER);
+    wiced_platform_register_button_callback(WICED_PLATFORM_BUTTON_1, button_cb, NULL, WICED_GPIO_PIN_BUTTON_TRIGGER);
 
     /* Initialize RTC */
     wiced_rtc_init();
@@ -527,7 +527,7 @@ wiced_bt_gatt_status_t low_power_20819_gatt_connect_callback( wiced_bt_gatt_conn
             WICED_BT_TRACE("Disconnected : BDA '%B', Connection ID '%d', Reason '%d'\r\n", p_conn_status->bd_addr, p_conn_status->conn_id, p_conn_status->reason );
             low_power_20819_conn_id = DUMMY;
 
-            /*Enter HID-Off */
+            /*Enter HID-Off after disconnect */
             low_power_20819_enter_hid_off();
         }
         status = WICED_BT_GATT_SUCCESS;
@@ -628,7 +628,15 @@ void button_cb (void* user_data, uint8_t value )
 
     wiced_bt_gatt_status_t disconnect_status;
 
-    WICED_BT_TRACE("\n\rButton CB\r\n");
+    WICED_BT_TRACE("\n\rButton CB %d\r\n", value);
+    if(wiced_hal_mia_is_reset_reason_hid_timeout())
+    {
+        WICED_BT_TRACE("Wake from timeout\n");
+    }
+    else
+    {
+        WICED_BT_TRACE("Wake from gpio\n");
+    }
 
     switch(low_power_20819_current_state)
     {
@@ -657,6 +665,26 @@ void button_cb (void* user_data, uint8_t value )
         }
         break;
     default:
+        WICED_BT_TRACE("low_power_20819_current_state %x\r\n", low_power_20819_current_state);
         break;
     }
+}
+
+/**************************************************************************************
+ * Function Name: uint32_t low_power_20819_sleep_time(void)
+ **************************************************************************************
+ * Summary: return allowable sleep time depending on app state
+ *
+ * Parameters: none
+ * Return: sleep_time
+ *
+ *************************************************************************************/
+uint32_t low_power_20819_sleep_time(void)
+{
+    uint32_t sleep_time = WICED_SLEEP_MAX_TIME_TO_SLEEP;
+    if(low_power_20819_current_state != SLEEP_WITHOUT_BLE)
+    {
+        sleep_time = 1000*10000; // 10 sec when non idle state (advertising, or connected)
+    }
+    return sleep_time;
 }

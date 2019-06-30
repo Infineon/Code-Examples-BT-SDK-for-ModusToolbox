@@ -56,6 +56,9 @@
 #include "wiced_hidd_lib.h"
 #include "blehidlink.h"
 #include "blehostlist.h"
+#include "wiced_platform.h"
+extern wiced_platform_led_config_t platform_led[];
+extern wiced_platform_gpio_t platform_gpio_pins[];
 
 /*******************************************************************************
 * Types and Defines
@@ -71,7 +74,6 @@
 #define RPT_ID_IN_ABS_XY         0x20
 #define RPT_ID_VOICE_CTL         0xF8
 #define MOTION_REPORT_ID         RPT_ID_MOUSE
-#define GPIO_RSTN_TP             WICED_P12
 #define GPIO_TOUCHPAD_OFF           0
 #define GPIO_TOUCHPAD_ON            1
 
@@ -355,21 +357,31 @@ typedef struct
 }RemoteReport;
 #pragma pack()
 
+#ifdef SUPPORT_MOTION
+ #define FINDME_LED WICED_PLATFORM_LED_1     // use first LED for findme LED
+ #define GPIO_MOTION_INT_GPIO    WICED_PLATFORM_GPIO_6                           // interrupt pin used for motion
+ #define GPIO_MOTION_INT         (platform_gpio_pins[GPIO_MOTION_INT_GPIO].gpio_pin)
+ #define GPIO_SDA_GPIO           WICED_PLATFORM_GPIO_7                           // SDA pin used for motion
+ #define GPIO_SDA                (platform_gpio_pins[GPIO_SDA_GPIO].gpio_pin)
+ #define GPIO_SDS_GPIO           WICED_PLATFORM_GPIO_8                           // SDS pin used for motion
+ #define GPIO_SDS                (platform_gpio_pins[GPIO_SDS_GPIO].gpio_pin)
+#endif
 
+#define GPIO_TOUCHPAD_INT_GPIO     WICED_PLATFORM_GPIO_5                           // interrupt pin used for touchpad interrupt
+#define GPIO_TOUCHPAD_INT          (platform_gpio_pins[GPIO_TOUCHPAD_INT_GPIO].gpio_pin)
+#define GPIO_RSTN_TP_GPIO          WICED_PLATFORM_GPIO_4                           // touchpad reset_N pin
+#define GPIO_RSTN_TP               (platform_gpio_pins[GPIO_RSTN_TP_GPIO].gpio_pin)
 #ifdef SUPPORT_TOUCHPAD
-#include "touchpad/touchPad.h"
-
-#define NUM_ROWS                    5
-#define NUM_COLS                    5  // 4 actual keyscan column + 1 extra column for touch pad virtual keys = 5 columns
-#define TOUCHPAD_BUTTON_KEYINDEX    4 // ENTER
-#define VKEY_INDEX_CENTER           TOUCHPAD_BUTTON_KEYINDEX
-#define VKEY_INDEX_RIGHT            (NUM_ROWS * (NUM_COLS-1))
-#define VKEY_INDEX_LEFT             (VKEY_INDEX_RIGHT+1)
-#define VKEY_INDEX_DOWN             (VKEY_INDEX_RIGHT+2)
-#define VKEY_INDEX_UP               (VKEY_INDEX_RIGHT+3)
+ #include "touchpad/touchPad.h"
+ #define NUM_ROWS                   5
+ #define NUM_COLS                   5  // 4 actual keyscan column + 1 extra column for touch pad virtual keys = 5 columns
+ #define TOUCHPAD_BUTTON_KEYINDEX   4 // ENTER
+ #define VKEY_INDEX_CENTER          TOUCHPAD_BUTTON_KEYINDEX
+ #define VKEY_INDEX_RIGHT           (NUM_ROWS * (NUM_COLS-1))
+ #define VKEY_INDEX_LEFT            (VKEY_INDEX_RIGHT+1)
+ #define VKEY_INDEX_DOWN            (VKEY_INDEX_RIGHT+2)
+ #define VKEY_INDEX_UP              (VKEY_INDEX_RIGHT+3)
 #endif /* SUPPORT_TOUCHPAD */
-
-
 
 #ifdef SUPPORTING_FINDME
 #include "pwm.h"
@@ -377,7 +389,8 @@ typedef struct
 
 #define LED_ON  0
 #define LED_OFF 1
-
+#define FINDME_LED WICED_PLATFORM_LED_1     // use first LED for findme LED
+#define GPIO_PORT_LED (*platform_led[FINDME_LED].gpio)
 
 // findMe BUZ alert config
 typedef struct
@@ -601,9 +614,7 @@ typedef struct
 /// The event queue for use by app.
     wiced_hidd_app_event_queue_t appEventQueue;
 
-
-
-#if SUPPORT_AUDIO
+#ifdef SUPPORT_AUDIO
     uint8_t audioStopEventInQueue;  //indicate if WICED_HIDD_RC_MIC_STOP_REQ event is in the event queue
     uint8_t micStopEventInQueue;    //indicate if WICED_HIDD_MIC_STOP event is in the event queue
     uint8_t audioPacketInQueue;
@@ -617,7 +628,6 @@ typedef struct
     uint8_t pollSeqn;
     uint8_t keyInterrupt_On;
     uint8_t allowSDS;
-
 
 } tRemoteAppState;
 

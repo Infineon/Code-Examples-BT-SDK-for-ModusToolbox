@@ -52,7 +52,7 @@ extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
  *          Constants
  ******************************************************/
 #define MESH_PID                0x310D
-#define MESH_VID                0x0001
+#define MESH_VID                0x0002
 #define MESH_FWID               0x300D000101010001
 #define MESH_CACHE_REPLAY_SIZE  0x0008
 
@@ -68,6 +68,8 @@ static void mesh_app_hardware_init(void);
 static void mesh_app_attention(uint8_t element_idx, uint8_t time);
 static void mesh_app_message_handler(uint8_t element_idx, uint16_t event, void *p_data);
 static void mesh_app_process_set_level(uint8_t element_idx, wiced_bt_mesh_light_lightness_status_t *p_data);
+static void mesh_app_process_sensor_status(uint8_t element_idx, wiced_bt_mesh_sensor_status_data_t *p_data);
+
 static void button_interrupt_handler(void* user_data, uint8_t value);
 static void process_button_push(uint8_t element_idx);
 
@@ -78,11 +80,11 @@ uint8_t mesh_mfr_name[WICED_BT_MESH_PROPERTY_LEN_DEVICE_MANUFACTURER_NAME] = { '
 uint8_t mesh_model_num[WICED_BT_MESH_PROPERTY_LEN_DEVICE_MODEL_NUMBER]     = { '1', '2', '3', '4', 0, 0, 0, 0 };
 uint8_t mesh_system_id[8]                                                  = { 0xbb, 0xb8, 0xa1, 0x80, 0x5f, 0x9f, 0x91, 0x71 };
 
-uint32_t mesh_light_lc_ambinet_lux_level_on         = 65535;
-uint32_t mesh_light_lc_ambinet_lux_level_prolong    = 1000;
-uint32_t mesh_light_lc_ambinet_lux_level_standby    = 0;
+uint32_t mesh_light_lc_ambient_lux_level_on         = 1000;    // Ambient light full daylight in lux
+uint32_t mesh_light_lc_ambient_lux_level_prolong    = 200;     // Ambient light overcast day in lux
+uint32_t mesh_light_lc_ambient_lux_level_standby    = 0;
 uint16_t mesh_light_lc_lightness_on                 = 65535;
-uint16_t mesh_light_lc_lightness_prolong            = 32767;
+uint16_t mesh_light_lc_lightness_prolong            = 10000;
 uint16_t mesh_light_lc_lightness_standby            = 1000;
 uint8_t  mesh_light_lc_regulator_accuracy           = 50;
 uint8_t  mesh_light_lc_regulator_kid                = 1;
@@ -112,9 +114,9 @@ wiced_bt_mesh_core_config_model_t   mesh_element2_models[] =
 
 wiced_bt_mesh_core_config_property_t mesh_element2_properties[] =
 {
-    { WICED_BT_MESH_PROPERTY_AMBIENT_LUX_LEVEL_ON     , _USER_, _RW_, WICED_BT_MESH_PROPERTY_LEN_AMBIENT_LUX_LEVEL_ON,      (uint8_t *)&mesh_light_lc_ambinet_lux_level_on      },
-    { WICED_BT_MESH_PROPERTY_AMBIENT_LUX_LEVEL_PROLONG, _USER_, _RW_, WICED_BT_MESH_PROPERTY_LEN_AMBIENT_LUX_LEVEL_PROLONG, (uint8_t *)&mesh_light_lc_ambinet_lux_level_prolong },
-    { WICED_BT_MESH_PROPERTY_AMBIENT_LUX_LEVEL_STANDBY, _USER_, _RW_, WICED_BT_MESH_PROPERTY_LEN_AMBIENT_LUX_LEVEL_STANDBY, (uint8_t *)&mesh_light_lc_ambinet_lux_level_standby },
+    { WICED_BT_MESH_PROPERTY_AMBIENT_LUX_LEVEL_ON     , _USER_, _RW_, WICED_BT_MESH_PROPERTY_LEN_AMBIENT_LUX_LEVEL_ON,      (uint8_t *)&mesh_light_lc_ambient_lux_level_on      },
+    { WICED_BT_MESH_PROPERTY_AMBIENT_LUX_LEVEL_PROLONG, _USER_, _RW_, WICED_BT_MESH_PROPERTY_LEN_AMBIENT_LUX_LEVEL_PROLONG, (uint8_t *)&mesh_light_lc_ambient_lux_level_prolong },
+    { WICED_BT_MESH_PROPERTY_AMBIENT_LUX_LEVEL_STANDBY, _USER_, _RW_, WICED_BT_MESH_PROPERTY_LEN_AMBIENT_LUX_LEVEL_STANDBY, (uint8_t *)&mesh_light_lc_ambient_lux_level_standby },
     { WICED_BT_MESH_PROPERTY_LIGHTNESS_ON             , _USER_, _RW_, WICED_BT_MESH_PROPERTY_LEN_LIGHTNESS_ON,              (uint8_t *)&mesh_light_lc_lightness_on              },
     { WICED_BT_MESH_PROPERTY_LIGHTNESS_PROLONG        , _USER_, _RW_, WICED_BT_MESH_PROPERTY_LEN_LIGHTNESS_PROLONG,         (uint8_t *)&mesh_light_lc_lightness_prolong         },
     { WICED_BT_MESH_PROPERTY_LIGHTNESS_STANDBY        , _USER_, _RW_, WICED_BT_MESH_PROPERTY_LEN_LIGHTNESS_STANDBY,         (uint8_t *)&mesh_light_lc_lightness_standby         },
@@ -274,7 +276,7 @@ void mesh_app_init(wiced_bool_t is_provisioned)
 
         wiced_bt_mesh_set_raw_scan_response_data(num_elem, adv_elem);
     }
-    led_control_init();
+    led_control_init(LED_CONTROL_TYPE_LEVEL);
 
     wiced_init_timer(&attention_timer, attention_timer_cb, 0, WICED_SECONDS_PERIODIC_TIMER);
 
@@ -346,6 +348,10 @@ void mesh_app_message_handler(uint8_t element_idx, uint16_t event, void *p_data)
         mesh_app_process_set_level(element_idx, (wiced_bt_mesh_light_lightness_status_t *)p_data);
         break;
 
+    case WICED_BT_MESH_SENSOR_STATUS:
+        mesh_app_process_sensor_status(element_idx, (wiced_bt_mesh_sensor_status_data_t *)p_data);
+        break;
+
     default:
         WICED_BT_TRACE("smart light unknown msg:%d\n", event);
         break;
@@ -366,6 +372,11 @@ void mesh_app_process_set_level(uint8_t element_idx, wiced_bt_mesh_light_lightne
 
     // If we were alerting user, stop it.
     wiced_stop_timer(&attention_timer);
+}
+
+void mesh_app_process_sensor_status(uint8_t element_idx, wiced_bt_mesh_sensor_status_data_t *p_data)
+{
+
 }
 
 /*

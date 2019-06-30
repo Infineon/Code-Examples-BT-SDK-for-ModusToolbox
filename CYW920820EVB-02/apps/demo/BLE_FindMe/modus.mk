@@ -38,7 +38,7 @@ CONFIG = Debug
 
 CY_EXAMPLE_NAME = BLE_FindMe
 
-CY_EXAMPLE_DESCRIPTION = This code example demonstrates the implementation of a simple BLE Immediate Alert Service (IAS)-based Find Me Profile (FMP) using CYW20819 device, using ModusToolbox IDE.
+CY_EXAMPLE_DESCRIPTION = This code example demonstrates the implementation of a simple BLE Immediate Alert Service (IAS)-based Find Me Profile (FMP)
 
 CY_SHOW_NEW_PROJECT := true
 
@@ -53,21 +53,20 @@ CY_APP_DEFINES += -DWICED_BT_TRACE_ENABLE
 CY_MAINAPP_SWCOMP_EXT =
 
 CY_APP_SOURCE = \
-    ./main.c \
+    ./BLE_FindMe.c \
     ./app_bt_cfg.c \
     ./app_bt_cfg.h \
     ./app_user_interface.c \
     ./app_user_interface.h \
     ./app_bt_event_handler.c \
     ./app_bt_event_handler.h \
-    ./design.modus \
     ./readme.txt \
-    ./wiced_platform.h \
     ./GeneratedSource/cycfg_bt.h \
     ./GeneratedSource/cycfg_gatt_db.c \
-    ./GeneratedSource/cycfg_gatt_db.h \
-    ./GeneratedSource/cycfg_pins.c \
-    ./GeneratedSource/cycfg_pins.h
+    ./GeneratedSource/cycfg_gatt_db.h
+
+# if app needs to use custom design.modus, define path here, needs to match same structure
+# as main app but under components not examples
 
 CY_APP_RESOURCES =
 

@@ -119,6 +119,7 @@ wiced_result_t blekb_management_cback(wiced_bt_management_evt_t event, wiced_bt_
     wiced_bt_device_link_keys_t *pLinkKeys;
     wiced_bt_ble_advert_mode_t * p_mode;
     uint8_t *p_keys;
+    wiced_bt_device_address_t         bda = { 0 };
 
     WICED_BT_TRACE("bt_stack_management_cback event%d\n", event);
 
@@ -126,6 +127,9 @@ wiced_result_t blekb_management_cback(wiced_bt_management_evt_t event, wiced_bt_
     {
         /* Bluetooth  stack enabled */
         case BTM_ENABLED_EVT:
+            hci_control_le_enable_trace();
+            wiced_bt_dev_read_local_addr(bda);
+            WICED_BT_TRACE("Local Bluetooth Address: [%B]\n", bda);
             blehid_app_init();
             break;
 

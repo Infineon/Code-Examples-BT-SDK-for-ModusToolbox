@@ -129,9 +129,11 @@ wiced_result_t bleremote_management_cback(wiced_bt_management_evt_t event, wiced
     {
         /* Bluetooth  stack enabled */
         case BTM_ENABLED_EVT:
-#if !defined(TESTING_USING_HCI) && defined(HCI_TRACES_EANBLED)
+#ifdef HCI_TRACES_EANBLED
             /* Register callback for receiving hci traces */
             wiced_bt_dev_register_hci_trace( myapp_hci_trace_cback );
+#else
+            hci_control_le_enable_trace();
 #endif
             blehid_app_init();
             break;

@@ -78,6 +78,8 @@ extern const wiced_bt_cfg_settings_t wiced_bt_cfg_settings; /* BT configuration 
 extern const wiced_bt_cfg_buf_pool_t wiced_bt_cfg_buf_pools[WICED_BT_CFG_NUM_BUF_POOLS]; /* BT buffer pools from wiced_bt_cfg.c file */
 
 wiced_sleep_config_t    low_power_sleep_config; /* sleep configuration */
+uint32_t low_power_20819_sleep_time(void);
+void low_power_post_sleep_callback(wiced_bool_t restore_configuration);
 
 /*******************************************************************
  * Function Prototypes
@@ -118,6 +120,23 @@ void application_start(void)
                             "HID-Off) in CYW20819\r\n"
                             "---------------------------------------------------------\r\n\n");
 
+    /* This checks whether device came out of HID off mode or reset */
+    if(wiced_hal_mia_is_reset_reason_por())
+    {
+        WICED_BT_TRACE("start reason: reset\n");
+    }
+    else
+    {
+        if(wiced_hal_mia_is_reset_reason_hid_timeout())
+        {
+            WICED_BT_TRACE("Wake from HID off: timed wake\n");
+        }
+        else
+        {
+            /* We woke up from hid-off, need to check if we woke because of GPIO */
+            WICED_BT_TRACE("Wake from HID off: gpio\n");
+        }
+    }
     /* Initialize Bluetooth Controller and Host Stack */
     if(WICED_BT_SUCCESS != wiced_bt_stack_init(low_power_20819_bt_management_callback, &wiced_bt_cfg_settings, wiced_bt_cfg_buf_pools))
     {
@@ -131,8 +150,9 @@ void application_start(void)
     low_power_sleep_config.device_wake_gpio_num   = WICED_GPIO_PIN_BUTTON;
     low_power_sleep_config.host_wake_mode         = WICED_SLEEP_WAKE_ACTIVE_HIGH;
     low_power_sleep_config.sleep_permit_handler   = low_power_sleep_handler;
-    low_power_sleep_config.post_sleep_cback_handler = NULL;
+    low_power_sleep_config.post_sleep_cback_handler = low_power_post_sleep_callback;
 
+    WICED_BT_TRACE("Configure for ePDS\r\n");
     if(WICED_BT_SUCCESS != wiced_sleep_configure(&low_power_sleep_config))
     {
         WICED_BT_TRACE("Sleep Configure failed\r\n");
@@ -162,10 +182,9 @@ uint32_t low_power_sleep_handler(wiced_sleep_poll_type_t type )
     {
         case WICED_SLEEP_POLL_SLEEP_PERMISSION:
             ret = WICED_SLEEP_ALLOWED_WITHOUT_SHUTDOWN;
-            WICED_BT_TRACE(".");
             break;
         case WICED_SLEEP_POLL_TIME_TO_SLEEP:
-            ret = WICED_SLEEP_MAX_TIME_TO_SLEEP;
+            ret = low_power_20819_sleep_time();
             break;
     }
     return ret;
@@ -199,4 +218,22 @@ void low_power_20819_enter_hid_off (void)
     {
         WICED_BT_TRACE("Entering HID-Off failed\r\n");
     }
+}
+
+/**************************************************************************************
+ * Function Name: uint32_t low_power_post_sleep_callback(wiced_bool_t restore_configuration )
+ **************************************************************************************
+ * Summary: Callback post sleep
+ *
+ * Parameters:
+ *  wiced_bool_t   restore_configuration:
+ *                   WICED_TRUE     - reconfigure configured gpios and re-initialize configured peripherals
+ *                   WICED_FALSE    - reconfiguration not required
+ *
+ * Return:
+ *   None
+ *
+ *************************************************************************************/
+void low_power_post_sleep_callback(wiced_bool_t restore_configuration)
+{
 }

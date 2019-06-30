@@ -44,7 +44,6 @@
 #include "motion_icm.h"
 #include "sensor_icm20608.h"
 #include "wiced_hal_i2c.h"
-#include "appDefs.h"
 
 #include "wiced_result.h"
 #include "wiced_timer.h"
@@ -336,12 +335,12 @@ uint8_t CMotionSensorICM_pollActivity(HidEventUserDefine * eventPtr)
     }
     else
     {
-        return NO_EVENTS;
+        return MOTION_NO_EVENTS;
     }
 
     if (!motionSensorPtr->isEnabled())
     {
-        return NO_EVENTS;
+        return MOTION_NO_EVENTS;
     }
 
     // poll for new sensor data
@@ -381,14 +380,14 @@ uint8_t CMotionSensorICM_pollActivity(HidEventUserDefine * eventPtr)
         }
         if (!idleTimerOn)
         {
-WICED_BT_TRACE("start motion idle timer\n");
+            WICED_BT_TRACE("start motion idle timer\n");
             wiced_start_timer(&idle_timer, MOTION_IDLE_TIMEOUT_mS);
             idleTimerOn = TRUE;
         }
-        return HID_EVENT_AVAILABLE;
+        return MOTION_EVENT_AVAILABLE;
     }
 
-    return NO_EVENTS;
+    return MOTION_NO_EVENTS;
 }
 
 //////////////////////////////////////////////////////////////
@@ -459,7 +458,7 @@ MotionSensorICM_c * CMotionSensorICM_CMotionSensorICM(void (*userfn)(void*, uint
     Intr_CIntr_Incomplete(&motionIntr, gpio, activeLogic, config);
     motionSensor.registerForInterrupt(userfn, objPtr);
 
-    wiced_init_timer(&idle_timer, (wiced_timer_callback_fp)idleTimerCb, 0, WICED_MILLI_SECONDS_TIMER );
+    wiced_init_timer(&idle_timer, (wiced_timer_callback_t)idleTimerCb, 0, WICED_MILLI_SECONDS_TIMER );
     motionSensorPtr = &motionSensor;
     return motionSensorPtr;
 }

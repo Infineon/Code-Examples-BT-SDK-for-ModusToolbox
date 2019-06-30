@@ -136,13 +136,11 @@ CY_APP_SOURCE = \
   ./ble_keyboard_gatts.h \
   ./wiced_bt_cfg.c \
   ./readme.txt \
-  ./wiced_platform.h \
-  ./design.modus \
-  ./GeneratedSource/cycfg_routing.h \
-  ./GeneratedSource/cycfg_pins.c \
-  ./GeneratedSource/cycfg_pins.h \
-  ./GeneratedSource/cycfg_notices.h \
   ./secure/ecdsa256_pub.c
+
+# if app needs to use custom design.modus, define path here, needs to match same structure
+# as main app but under components not examples
+CY_APP_COMPONENT_PATH_BASE := common/apps/demo/hid/ble_keyboard
 
 ifeq ($(OTA_SEC_FW_UPGRADE),1)
 ifneq ($(OTA_FW_UPGRADE),1)

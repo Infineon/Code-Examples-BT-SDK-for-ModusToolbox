@@ -398,7 +398,6 @@ static uint32_t hci_control_sleep_hanlder(wiced_sleep_poll_type_t type )
 {
     uint32_t ret = WICED_SLEEP_NOT_ALLOWED;
 
-    WICED_BT_TRACE(".");
     switch(type)
     {
         case WICED_SLEEP_POLL_SLEEP_PERMISSION:
@@ -406,9 +405,7 @@ static uint32_t hci_control_sleep_hanlder(wiced_sleep_poll_type_t type )
             {
 #ifdef ENABLE_SDS_SLEEP
                 ret = WICED_SLEEP_ALLOWED_WITH_SHUTDOWN;
-                WICED_BT_TRACE("$");
 #else
-                WICED_BT_TRACE("&");
                 ret = WICED_SLEEP_ALLOWED_WITHOUT_SHUTDOWN;
 #endif
             }
@@ -468,7 +465,7 @@ void hci_control_sleep_configure()
         static wiced_sleep_config_t    hci_control_sleep_config;
         // For UART mode MCU should control wake gpio and configure the sleep
         hci_control_sleep_config.sleep_mode             = WICED_SLEEP_MODE_TRANSPORT;
-#ifdef CYW20719B1
+#if defined(CYW20719B1) || defined(CYW20719B2) || defined(CYW20721B2)
         hci_control_sleep_config.device_wake_gpio_num   = WICED_P17;
 #else
         hci_control_sleep_config.device_wake_gpio_num   = WICED_P12;

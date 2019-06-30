@@ -121,6 +121,7 @@ wiced_result_t blemouse_management_cback(wiced_bt_management_evt_t event, wiced_
     {
         /* Bluetooth  stack enabled */
         case BTM_ENABLED_EVT:
+            hci_control_le_enable_trace();
             blehid_app_init();
             break;
 

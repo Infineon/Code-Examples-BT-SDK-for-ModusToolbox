@@ -1,1 +1,0 @@
-Up to date Mesh Peer Apps are located here. Use these apps as opposed to the versions that are installed as part of the BT SDK install process. Copy and replace them in <Install Path>\ModusToolbox_1.1\libraries\bt_sdk-1.1\components\BT-SDK\common\apps\snip\mesh\peerapps

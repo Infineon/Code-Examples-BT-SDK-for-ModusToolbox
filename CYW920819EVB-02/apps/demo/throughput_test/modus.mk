@@ -81,13 +81,13 @@ CY_APP_SOURCE =  \
   ./GeneratedSource/cycfg_bt.h \
   ./GeneratedSource/cycfg_gatt_db.c \
   ./GeneratedSource/cycfg_gatt_db.h \
-  ./GeneratedSource/cycfg_pins.h \
-  ./GeneratedSource/cycfg_pins.c \
-  ./design.modus \
-  ./wiced_platform.h \
   ./le_coc/tput_le_coc.c \
   ./le_coc/tput_le_coc.h \
   ./readme.txt
+
+# if app needs to use custom design.modus, define path here, needs to match same structure
+# as main app but under components not examples
+CY_APP_COMPONENT_PATH_BASE := 208XX-A1_Bluetooth/apps/demo/throughput_test
 
 CY_APP_RESOURCES =
 

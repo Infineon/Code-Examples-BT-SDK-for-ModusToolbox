@@ -36,6 +36,9 @@
  *
  * This file shows how to create a device which implements mesh user sensor client.
  */
+
+#ifdef WICED_BT_MESH_MODEL_SENSOR_CLIENT_INCLUDED
+
 #include "wiced_bt_ble.h"
 #include "wiced_bt_gatt.h"
 #include "wiced_bt_mesh_models.h"
@@ -620,5 +623,7 @@ void mesh_sensor_settings_hci_event_send(wiced_bt_mesh_hci_event_t *p_hci_event,
     }
     mesh_transport_send_data(HCI_CONTROL_MESH_EVENT_SENSOR_SETTINGS_STATUS, (uint8_t *)p_hci_event, (uint16_t)(p - (uint8_t *)p_hci_event));
 }
+
+#endif
 
 #endif

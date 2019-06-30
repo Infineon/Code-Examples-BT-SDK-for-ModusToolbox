@@ -1,10 +1,10 @@
 ------------------------------------------------------------------------------------
-BT SDK - CYW20721B2
+BT SDK - CYW20721
 ------------------------------------------------------------------------------------
 
 Overview
 --------
-The Cypress CYW20721B2 is an ultra-low-power dual-mode Bluetooth 5.0 wireless
+The Cypress CYW20721 is an ultra-low-power dual-mode Bluetooth 5.0 wireless
 MCU device. It has a stand-alone baseband processor with an integrated 2.4 GHz
 transceiver supporting BR/EDR/BLE.  
 
@@ -14,11 +14,9 @@ SDK Software Features
 - BT stack and profile level APIs for embedded BT application development.
 - WICED HCI protocol to simplify host/MCU application development.
 - APIs and drivers to access on board peripherals
-- Bluetooth protocols include GAP, GATT, SMP, RFCOMM, SDP, AVDT/AVCT
+- Bluetooth protocols include GAP, GATT, SMP, RFCOMM, SDP, AVDT/AVCT, BLE Mesh
 - BLE and BR/EDR profile APIs, libraries and sample apps
 - Support for Over-The-Air (OTA) upgrade.
-- Device Configurator for creating custom pin mapping.
-- Bluetooth Configurator for creating BLE GATT Database.
 - Documentation for APIs, datasheet, profiles and features.
 
 Kits
@@ -48,21 +46,20 @@ BT/BLE Profile Client Control:
     It is supported on Windows, Linux and macOS.
     <Install Dir>\ModusToolbox_1.1\libraries\bt_sdk-1.x\components\BT-SDK\common\client_control
 
+BLE Mesh Client Control:
+    Similar to the above app, this application emulates the host MCU applications
+    for BLE Mesh models. It can configure and provision mesh devices and create mesh
+    network. The application is located in folder below. (Currently for Windows OS only).
+    <Install Dir>\ModusToolbox_1.1\libraries\bt_sdk-1.x\components\BT-SDK\common\apps\snip\mesh\ClientControl
+    See readme.txt in the same folder.
+
 Peer apps:
     Application that run on Windows, iOS or Android and act as peer
     BT apps to demonstrate specific profiles or features.
     BT/BLE apps location -
     <Install Dir>\ModusToolbox_1.1\libraries\bt_sdk-1.x\components\BT-SDK\common\peer_apps
-
-Device Configurator:
-    Use this tool to create custom pin mapping for your device. Run this tool from ModusToolbox IDE
-    "Configure Device" menu. It is supported on Windows, Linux and macOS.
-    Note: The pin mapping is based on wiced_platform.h for your board.
-
-Bluetooth Configurator:
-    Use this application to create and configure BLE GATT Database for your application.
-    Run this tool from ModusToolbox IDE "Configure Device" menu -> Peripherals -> Bluetooth
-    -> External tools. It is supported on Windows, Linux and macOS.
+    BLE Mesh apps location -
+    <Install Dir>\ModusToolbox_1.1\libraries\bt_sdk-1.x\components\BT-SDK\common\apps\snip\mesh\peerapps
 
 Tracing
 -------
@@ -87,24 +84,13 @@ UART
     Select the UART port you want the application to be downloaded. For example 'COM6'
     on Windows or '/dev/ttyWICED_HCI_UART0' on Linux or '/dev/tty.usbserial-000154' on macOS.
     By default, the SDK will auto detect the port.
-APP_XIP
-    This setting controls the "eXecute In Place" build option for an application. Here XIP
-    means executing directly from On Chip Flash, rather than copying code to RAM first.
-    Choices include 'xip' and 'xip_pi', which adds position independence. The trade-offs
-    for the two settings are overall image size and compatible Over The Air update methods.
-    The xip_pi build results in a bit larger image because tables and code are added to support
-    position independent calls to ROM functions or accesses to RAM data. The position independence
-    allows the load location of the image to be swapped, so fail-safe OTA firmware updates that always
-    keep a known-good application image in On Chip Flash can be used. The drawback is that less than
-    half of the On Chip Flash is available, limiting the overall xip_pi image size.
-    The 'xip' option is built to run from one load location and optimizes size. The load location
-    cannot be swapped to support OCF-only firmware updates. The recommended OTA firmware update method
-    for 'xip' uses external flash to temporarily store the image during download and verification.
-    This means the 'xip' method can support images larger than half the OCF size, but requires
-    external serial flash for storage.
 ENABLE_DEBUG
     For HW debugging, select the option '1'. See the document WICED-Hardware-Debugging.pdf
-    for more information.
+    for more information. This setting configures GPIO for SWD.
+    CYW920721B2EVK-01: SWD hardware debugging is not compatible with the CYW9BT_AUDIO board.
+    PUART RX/TX signals are shared with SWDCK and SWDIO. Remove RX and TX jumpers on J10
+    when using SWD. PUART and SWD cannot be used simultaneously on this board unless these
+    pins are changed from the default configuration.
 
 Downloading application to kit
 ------------------------------
@@ -116,16 +102,13 @@ If you have issues downloading to the kit, follow the steps below -
 
 After downloading the application, press the 'Reset' button on the kit.
 
-When using CYW920721B2EVK-01 kit on macOS, make sure to download the latest FTDI drivers
-from ftdichip.com (especially for macOS 10.10 or below).
-
 Over The Air (OTA) Firmware Upgrade
 -----------------------------------
 Application that support OTA upgrade can be updated via peer OTA apps located in the folder -
 <Install Dir>\ModusToolbox_1.1\libraries\bt_sdk-1.x\components\BT-SDK\common\peer_apps\ota_firmware_upgrade
 See the readme.txt file located in the above folder for instructions.
 To generate OTA image for the app, append command line OTA_FW_UPGRADE=1 to the build, for example
-> make PLATFORM=CYW920721B2EVK_01 OTA_FW_UPGRADE=1
+> make PLATFORM=CYW920721B2EVK-01 OTA_FW_UPGRADE=1
 This will generate <app>.bin file in the 'build' folder.
 
 

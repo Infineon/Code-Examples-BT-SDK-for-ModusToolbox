@@ -77,7 +77,7 @@ ifneq ($(findstring fw_upgrade_lib,$(CY_MAINAPP_SWCOMP_USED)),)
 ifeq ($(PLATFORM),CYW920706WCDEVAL)
 CY_APP_PATCH_LIBS = rtc_lib.a wiced_bt_mesh.a
 endif # PLATFORM
-endif # ($(filter fw_upgrade_lib,$(CY_MAINAPP_SWCOMP_USED)),)
+endif # ($(findstring fw_upgrade_lib,$(CY_MAINAPP_SWCOMP_USED)),)
 
 # NOTE: This variable cannot be renamed or moved to a different file. It is updated by the ModusToolbox
 # middleware editor.

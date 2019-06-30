@@ -105,14 +105,14 @@ wiced_result_t app_bt_management_callback(wiced_bt_management_evt_t event, wiced
         case BTM_ENABLED_EVT:
 
             /* Bluetooth Controller and Host Stack Enabled */
-            WICED_BT_TRACE("Bluetooth Enabled (%s)\n",
+            WICED_BT_TRACE("Bluetooth Enabled (%s)\n\r",
                     ((WICED_BT_SUCCESS == p_event_data->enabled.status) ? "success" : "failure"));
 
             if (WICED_BT_SUCCESS == p_event_data->enabled.status)
             {
                 /* Bluetooth is enabled */
                 wiced_bt_dev_read_local_addr(bda);
-                WICED_BT_TRACE("Local Bluetooth Address: [%B]\n", bda);
+                WICED_BT_TRACE("Local Bluetooth Address: [%B]\n\r", bda);
 
                 /* Perform application-specific initialization */
                 ble_app_init();
@@ -124,12 +124,12 @@ wiced_result_t app_bt_management_callback(wiced_bt_management_evt_t event, wiced
 
             /* Advertisement State Changed */
             p_adv_mode = &p_event_data->ble_advert_state_changed;
-            WICED_BT_TRACE("Advertisement State Change: %d\n", *p_adv_mode);
+            WICED_BT_TRACE("Advertisement State Change: %d\n\r", *p_adv_mode);
 
             if (BTM_BLE_ADVERT_OFF == *p_adv_mode)
             {
                 /* Advertisement Stopped */
-                WICED_BT_TRACE("Advertisement stopped\n");
+                WICED_BT_TRACE("Advertisement stopped\n\r");
 
                 /* Check connection status after advertisement stops */
                 if(bt_connection_id == 0)
@@ -144,7 +144,7 @@ wiced_result_t app_bt_management_callback(wiced_bt_management_evt_t event, wiced
             else
             {
                 /* Advertisement Started */
-                WICED_BT_TRACE("Advertisement started \n");
+                WICED_BT_TRACE("Advertisement started\n\r");
                 app_bt_adv_conn_state = APP_BT_ADV_ON_CONN_OFF;
             }
 
@@ -154,7 +154,7 @@ wiced_result_t app_bt_management_callback(wiced_bt_management_evt_t event, wiced
             break;
 
         default:
-            WICED_BT_TRACE("Unhandled Bluetooth Management Event: 0x%x (%d)\n", event, event);
+            WICED_BT_TRACE("Unhandled Bluetooth Management Event: 0x%x (%d)\n\r", event, event);
             break;
     }
 
@@ -354,7 +354,7 @@ static wiced_bt_gatt_status_t ble_app_get_value(uint16_t attr_handle, uint16_t c
         {
             default:
                 /* The read operation was not performed for the indicated handle */
-                WICED_BT_TRACE("Read Request to Invalid Handle: 0x%x\n", attr_handle);
+                WICED_BT_TRACE("Read Request to Invalid Handle: 0x%x\n\r", attr_handle);
                 res = WICED_BT_GATT_READ_NOT_PERMIT;
                 break;
         }
@@ -413,7 +413,7 @@ static wiced_bt_gatt_status_t ble_app_set_value(uint16_t attr_handle, uint16_t c
                 switch ( attr_handle )
                 {
                     case HDLC_IAS_ALERT_LEVEL_VALUE:
-                        WICED_BT_TRACE("Alert Level = %d\n", app_ias_alert_level[0]);
+                        WICED_BT_TRACE("Alert Level = %d\n\r", app_ias_alert_level[0]);
                         ias_led_update();
                         break;
                 }
@@ -438,7 +438,7 @@ static wiced_bt_gatt_status_t ble_app_set_value(uint16_t attr_handle, uint16_t c
         {
             default:
                 /* The write operation was not performed for the indicated handle */
-                WICED_BT_TRACE("Write Request to Invalid Handle: 0x%x\n", attr_handle);
+                WICED_BT_TRACE("Write Request to Invalid Handle: 0x%x\n\r", attr_handle);
                 res = WICED_BT_GATT_WRITE_NOT_PERMIT;
                 break;
         }
@@ -519,7 +519,7 @@ static wiced_bt_gatt_status_t ble_app_connect_callback(wiced_bt_gatt_connection_
         if ( p_conn_status->connected )
         {
             /* Device has connected */
-            WICED_BT_TRACE("Connected : BDA '%B', Connection ID '%d'\n", p_conn_status->bd_addr, p_conn_status->conn_id );
+            WICED_BT_TRACE("Connected : BDA '%B', Connection ID '%d'\n\r", p_conn_status->bd_addr, p_conn_status->conn_id );
 
             /* Store the connection ID */
             bt_connection_id = p_conn_status->conn_id;
@@ -530,7 +530,7 @@ static wiced_bt_gatt_status_t ble_app_connect_callback(wiced_bt_gatt_connection_
         else
         {
             /* Device has disconnected */
-            WICED_BT_TRACE("Disconnected : BDA '%B', Connection ID '%d', Reason '%d'\n", p_conn_status->bd_addr, p_conn_status->conn_id, p_conn_status->reason );
+            WICED_BT_TRACE("Disconnected : BDA '%B', Connection ID '%d', Reason '%d'\n\r", p_conn_status->bd_addr, p_conn_status->conn_id, p_conn_status->reason );
 
             /* Set the connection id to zero to indicate disconnected state */
             bt_connection_id = 0;

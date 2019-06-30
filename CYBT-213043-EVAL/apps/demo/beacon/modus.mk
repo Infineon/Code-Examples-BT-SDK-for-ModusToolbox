@@ -47,9 +47,7 @@ CY_VALID_PLATFORMS = CYBT-213043-EVAL
 PLATFORM = CYBT-213043-EVAL
 
 #generate the OTA bin by default
-ifneq ($(PLATFORM),CYBT-213043-EVAL)
 OTA_FW_UPGRADE=1
-endif
 
 # NOTE: This variable cannot be renamed or moved to a different file. It is updated by the ModusToolbox
 # middleware editor.
@@ -92,7 +90,7 @@ endif # PLATFORM
 ifeq ($(PLATFORM),CYW920735Q60EVB-01)
 endif # PLATFORM
 
-ifeq ($(PLATFORM),CYW920721B2EVK-01)
+ifneq ($(filter CYW920721B2EVK-01 CYW920719B2Q40EVB-01,$(PLATFORM)),)
 endif # PLATFORM
 
 ifeq ($(OTA_FW_UPGRADE),1)

@@ -54,7 +54,7 @@ extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
  *          Constants
  ******************************************************/
 #define MESH_PID                0x3016
-#define MESH_VID                0x0001
+#define MESH_VID                0x0002
 #define MESH_FWID               0x3016000101010001
 #define MESH_CACHE_REPLAY_SIZE  0x0008
 
@@ -278,5 +278,29 @@ uint32_t mesh_app_proc_rx_cmd(uint16_t cmd_opcode, uint8_t *p_data, uint32_t dat
 void wiced_bt_mesh_core_rtc_init(void)
 {
     rtc_init();
+}
+#endif
+
+// Temporary dummy implementation of some functions to exclude fw_upgrade_lib.a from the build
+#if defined(CYW43012C0)
+#include "wiced_bt_ota_firmware_upgrade.h"
+wiced_bool_t wiced_ota_fw_upgrade_init(void *public_key, wiced_ota_firmware_upgrade_status_callback_t *p_status_callback, wiced_ota_firmware_upgrade_send_data_callback_t *p_send_data_callback)
+{
+    return WICED_FALSE;
+}
+wiced_bt_gatt_status_t wiced_ota_fw_upgrade_write_handler(uint16_t conn_id, wiced_bt_gatt_write_t *p_write_data)
+{
+    return 0;
+}
+wiced_bt_gatt_status_t wiced_ota_fw_upgrade_indication_cfm_handler(uint16_t conn_id, uint16_t handle)
+{
+    return 0;
+}
+wiced_bt_gatt_status_t wiced_ota_fw_upgrade_read_handler(uint16_t conn_id, wiced_bt_gatt_read_t * p_read_data)
+{
+    return 0;
+}
+void wiced_ota_fw_upgrade_connection_status_event(wiced_bt_gatt_connection_status_t *p_status)
+{
 }
 #endif

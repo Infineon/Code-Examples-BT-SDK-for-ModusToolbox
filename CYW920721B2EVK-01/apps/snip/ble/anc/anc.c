@@ -1554,7 +1554,7 @@ void anc_handle_get_version(void)
     tx_buf[cmd++] = chip & 0xFF;
     tx_buf[cmd++] = (chip>>8) & 0xFF;
     tx_buf[cmd++] = (chip>>24) & 0xFF;
-    tx_buf[cmd++] = POWER_CLASS;
+    tx_buf[cmd++] = 0; // not used
 
     /* Send MCU app the supported features */
     tx_buf[cmd++] = HCI_CONTROL_GROUP_ANC;

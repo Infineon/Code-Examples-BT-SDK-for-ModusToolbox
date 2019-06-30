@@ -82,9 +82,11 @@ extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
  *          Constants
  ******************************************************/
 #define MESH_PID                0x3125
-#define MESH_VID                0x0001
+#define MESH_VID                0x0002
 #define MESH_FWID               0x3125000101010001
 #define MESH_CACHE_REPLAY_SIZE  0x0008
+
+#define TRANSITION_INTERVAL     100     // receive status notifications every 100ms during transition to new state
 
 /******************************************************
  *          Structures
@@ -95,7 +97,7 @@ extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
  ******************************************************/
 static void mesh_app_init(wiced_bool_t is_provisioned);
 static void mesh_low_power_led_message_handler(uint8_t element_idx, uint16_t event, void *p_data);
-static void mesh_low_power_led_process_set(uint8_t element_idx, wiced_bt_mesh_onoff_status_data_t *p_data);
+static void mesh_low_power_led_process_status(uint8_t element_idx, wiced_bt_mesh_onoff_status_data_t *p_data);
 #if defined(LOW_POWER_NODE) && (LOW_POWER_NODE == 1)
 void mesh_low_power_led_lpn_sleep(uint32_t duration);
 #endif
@@ -265,7 +267,7 @@ void mesh_app_init(wiced_bool_t is_provisioned)
 
     led_control_init(LED_CONTROL_TYPE_ONOFF);
 
-    wiced_bt_mesh_model_power_onoff_server_init(MESH_LOW_POWER_LED_ELEMENT_INDEX, mesh_low_power_led_message_handler, is_provisioned);
+    wiced_bt_mesh_model_power_onoff_server_init(MESH_LOW_POWER_LED_ELEMENT_INDEX, mesh_low_power_led_message_handler, TRANSITION_INTERVAL, is_provisioned);
 }
 
 /*
@@ -275,8 +277,11 @@ void mesh_low_power_led_message_handler(uint8_t element_idx, uint16_t event, voi
 {
     switch (event)
     {
+    case WICED_BT_MESH_ONOFF_STATUS:
+        mesh_low_power_led_process_status(element_idx, (wiced_bt_mesh_onoff_status_data_t *)p_data);
+        break;
+
     case WICED_BT_MESH_ONOFF_SET:
-        mesh_low_power_led_process_set(element_idx, (wiced_bt_mesh_onoff_status_data_t *)p_data);
         break;
 
     default:
@@ -287,7 +292,7 @@ void mesh_low_power_led_message_handler(uint8_t element_idx, uint16_t event, voi
 /*
  * This function is called when command to change state is received over mesh.
  */
-void mesh_low_power_led_process_set(uint8_t element_idx, wiced_bt_mesh_onoff_status_data_t *p_status)
+void mesh_low_power_led_process_status(uint8_t element_idx, wiced_bt_mesh_onoff_status_data_t *p_status)
 {
     led_control_set_onoff(p_status->present_onoff);
 }

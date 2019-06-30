@@ -48,7 +48,7 @@
 #define MAX_LOCAL_CID                   0xFFFF  //Maximum local channel id value
 #define MINIMUM_LE_COC_TX_BUFFER_LEN    1       //Minimum tx buffer length
 #if !defined (CONGESTION_LED)
-#define CONGESTION_LED                  WICED_GET_PIN_FOR_LED(1)
+#define CONGESTION_LED                  WICED_GET_PIN_FOR_LED(WICED_PLATFORM_LED_1)
 #endif
 
 extern uint32_t                          numBytesTx_coc;

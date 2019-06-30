@@ -172,7 +172,7 @@ ans_app_cb_t ans_app_cb;
 #define ANS_CLIENT_NAME         "ANC"
 const char *p_ans_client_name = ANS_CLIENT_NAME;
 
-#define HCI_TRACE_OVER_TRANSPORT        1 /* Enable by default HCI trace */
+//#define HCI_TRACE_OVER_TRANSPORT        1 /* Uncomment to enable HCI trace */
 #define TRANS_UART_BUFFER_SIZE          1024
 #define ANS_TRANS_MAX_BUFFERS           2
 const wiced_transport_cfg_t transport_cfg =
@@ -1075,7 +1075,7 @@ void ans_handle_get_version(void)
     tx_buf[cmd++] = chip & 0xFF;
     tx_buf[cmd++] = (chip>>8) & 0xFF;
     tx_buf[cmd++] = (chip>>24) & 0xFF;
-    tx_buf[cmd++] = POWER_CLASS;
+    tx_buf[cmd++] = 0; // not used
 
     /* Send MCU app the supported features */
     tx_buf[cmd++] = HCI_CONTROL_GROUP_ANS;

@@ -105,6 +105,7 @@
 #include "gki_target.h"
 #include "wiced_bt_cfg.h"
 #include "ble_remote_gatts.h"
+#include "blehidgatts.h"
 #include "ble_remote.h"
 #include "wiced_bt_gatt.h"
 #include "wiced_hal_mia.h"
@@ -567,6 +568,23 @@ void bleremoteapp_create(void)
 
 }
 
+#ifdef CONNECTED_ADVERTISING_SUPPORTED
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+void bleremote_2nd_link_up_handler(wiced_bt_gatt_connection_status_t *p_status)
+{
+    //do not allow SDS while switching connections
+    bleRemoteAppState->allowSDS = 0;
+
+    //Start 20 second timer to allow time to setup connection encryption
+    //before allowing SDS.
+    if (wiced_is_timer_in_use(&allow_sleep_timer))
+    {
+        wiced_stop_timer(&allow_sleep_timer);
+    }
+    wiced_start_timer(&allow_sleep_timer,20000); //20 seconds. timeout in ms
+}
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 /// The remote application activation method.
@@ -574,6 +592,10 @@ void bleremoteapp_create(void)
 void bleremoteapp_init(void)
 {
     WICED_BT_TRACE("bleremoteapp_init\n");
+
+#ifdef CONNECTED_ADVERTISING_SUPPORTED
+    wiced_bt_gatt_2nd_link_up_handler = bleremote_2nd_link_up_handler;
+#endif
 
     // Determine the size of the standard report. Report ID will not be sent.
     bleRemoteAppState->stdRptSize = kbAppConfig.maxKeysInStdRpt +
@@ -2217,7 +2239,7 @@ uint8_t bleremoteapp_pollActivitySensor(void)
 {
 #ifdef SUPPORT_MOTION
     HidEventUserDefine event;
-    if (HID_EVENT_AVAILABLE == motionsensor->pollActivity(&event))
+    if (MOTION_EVENT_AVAILABLE == motionsensor->pollActivity(&event))
     {
         wiced_hidd_event_queue_add_event_with_overflow(&bleRemoteAppState->appEventQueue,
                      (HidEvent *)&event,
