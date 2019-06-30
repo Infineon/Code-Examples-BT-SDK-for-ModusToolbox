@@ -10,7 +10,7 @@ These examples demonstrate the functionality of following devices:
 
 Each example has a readme.txt that explains what do and what to observe when running the example. Also review the chip specific readme.txt for an overvivew of the BT SDK features and tools.
 
-See BT-SDK-1.3-Code-Examples.html for details of applications and supported devices.
+See BTSDK-1.3-CodeExamples.pdf for details of applications and supported devices.
 
 Apps in the 'demo' folder are reference applications and more complex in nature. Apps in the 'snips' folder demonstrate a specific feature or library. These examples support ModusToolbox v1.1. They do not work with ModusToolbox v1.0.
 
