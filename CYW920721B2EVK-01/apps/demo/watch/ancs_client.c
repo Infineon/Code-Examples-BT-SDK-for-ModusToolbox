@@ -660,7 +660,7 @@ void ancs_client_process_notification_source(uint8_t *data, int len)
 void ancs_client_process_event_attribute(uint8_t  *data, int len)
 {
     uint8_t                 type = data[0];
-    uint16_t                length = data[1] + (data[2] >> 8);
+    uint16_t                length = data[1] + (data[2] << 8);
     uint8_t *               p_event_data = &data[3];
     ancs_event_t *          p_event = ancs_client.p_first_event;
     ancs_queued_event_t *   p_queued_event;

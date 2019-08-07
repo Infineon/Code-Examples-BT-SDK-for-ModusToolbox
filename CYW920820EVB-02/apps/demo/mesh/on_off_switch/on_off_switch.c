@@ -308,4 +308,3 @@ void process_button_push(uint8_t element_idx)
 
     wiced_bt_mesh_model_onoff_client_set(element_idx, &set_data);
 }
-

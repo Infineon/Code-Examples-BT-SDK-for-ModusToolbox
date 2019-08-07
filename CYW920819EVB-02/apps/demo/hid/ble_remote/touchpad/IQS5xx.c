@@ -101,7 +101,7 @@ static TPDrv_t   theTpDrv = {
     fingerCount,
     readXYData,
     clearData,
-    clearFingerData,	
+    clearFingerData,
     getRpt,
 };
 

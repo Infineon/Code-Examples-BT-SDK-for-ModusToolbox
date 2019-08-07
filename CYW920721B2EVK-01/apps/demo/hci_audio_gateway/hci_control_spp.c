@@ -732,4 +732,3 @@ void hci_control_spp_rfcomm_flow_control_timer( uint32_t param )
         wiced_start_timer( &rfcomm_flow_control_timer, 500 );
     }
 }
-

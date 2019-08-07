@@ -906,4 +906,3 @@ tXML_VLIST_RES XML_VlistParse( tXML_VLIST_PARSER   *p_xml_state,
                                                application really should be interested! */
     return x_res;
 }
-

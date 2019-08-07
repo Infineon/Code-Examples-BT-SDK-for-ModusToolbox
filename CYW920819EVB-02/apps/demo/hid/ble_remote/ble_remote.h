@@ -57,8 +57,17 @@
 #include "blehidlink.h"
 #include "blehostlist.h"
 #include "wiced_platform.h"
+
+extern const uint8_t blehid_db_data[];
+extern const uint16_t blehid_db_size;
+extern const wiced_bt_cfg_buf_pool_t wiced_bt_hid_cfg_buf_pools[];
+extern const wiced_bt_cfg_settings_t wiced_bt_hid_cfg_settings;
+extern wiced_bt_device_link_keys_t  blehostlist_link_keys;
+extern uint16_t blehostlist_flags;
 extern wiced_platform_led_config_t platform_led[];
 extern wiced_platform_gpio_t platform_gpio_pins[];
+extern uint8_t bleremote_key_std_rpt[];
+extern uint8_t bleremote_bitmap_rpt[];
 
 /*******************************************************************************
 * Types and Defines

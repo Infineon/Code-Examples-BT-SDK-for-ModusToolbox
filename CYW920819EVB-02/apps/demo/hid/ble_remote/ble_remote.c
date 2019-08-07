@@ -261,19 +261,14 @@ wiced_blehidd_report_gatt_characteristic_t bleRemoteReportModeGattMap[] =
 
 };
 
-extern wiced_bt_cfg_settings_t wiced_bt_hid_cfg_settings;
-extern uint16_t blehostlist_flags;
-extern wiced_bool_t blehidlink_connection_param_updated;
-
-
 extern KbAppConfig kbAppConfig;
 extern KbKeyConfig kbKeyConfig[];
 extern uint8_t kbKeyConfig_size;
 extern RemoteAppConfig remoteAppConfig;
+extern wiced_bool_t blehidlink_connection_param_updated;
 
 tRemoteAppState ble_remote_application_state = {0, };
 tRemoteAppState  *bleRemoteAppState  = &ble_remote_application_state;
-
 uint16_t  characteristic_client_configuration[MAX_NUM_CLIENT_CONFIG_NOTIF] = {0,};
 uint8_t bleremote_key_std_rpt[KEYRPT_LEN] = {0, };       //map to (&(bleRemoteAppState->stdRpt.modifierKeys))[bleRemoteAppState->stdRptSize]
 uint8_t bleremote_bitmap_rpt[KEYRPT_NUM_BYTES_IN_BIT_MAPPED_REPORT] = {0, };  //map to bleRemoteAppState->bitMappedReport.bitMappedKeys[]

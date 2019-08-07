@@ -30,5 +30,4 @@
 # of such system or application assumes all risk of such use and in doing
 # so agrees to indemnify Cypress against all liability.
 #
-
 include modus.mk

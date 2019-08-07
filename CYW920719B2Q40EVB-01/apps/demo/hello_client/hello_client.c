@@ -1390,4 +1390,3 @@ wiced_bool_t hello_client_is_device_bonded( wiced_bt_device_address_t bd_address
     UNUSED_VARIABLE(bytes_read);
     return WICED_FALSE;
 }
-

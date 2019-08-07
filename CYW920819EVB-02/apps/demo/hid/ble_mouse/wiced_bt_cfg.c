@@ -49,7 +49,6 @@
 #include "wiced_bt_ota_firmware_upgrade.h"
 #endif
 
-
 const char  dev_local_name[]             = "CY BLE MOUSE";
 const uint8_t dev_appearance_name[2]     = {BIT16_TO_8(APPEARANCE_HID_MOUSE)};
 const uint8_t dev_pnp_id[]               ={0x01, 0x31, 0x01, 0xB4, 0x04, 0x01, 0x00}; //BT SIG, cypress semiconductor, 0x04B4, 0x0001
@@ -60,14 +59,6 @@ const uint8_t   rpt_ref_input[]               = {MOUSE_REPORT_ID,0x01};
 
 const uint8_t dev_hid_information[] = {0x00, 0x01, 0x00, 0x00};      // Verison 1.00, Not localized, Cannot remote wake, not normally connectable
 const uint16_t dev_battery_service_uuid = UUID_CHARACTERISTIC_BATTERY_LEVEL;
-
-extern uint16_t characteristic_client_configuration[];
-extern uint8_t mouseapp_protocol;
-extern uint8_t battery_level;
-
-extern uint8_t blemouse_input_rpt[];
-
-
 
 /*****************************************************************************
  * This is the GATT database for the BLE HID MOUSE application.  It defines
@@ -766,6 +757,3 @@ const wiced_bt_cfg_buf_pool_t wiced_bt_hid_cfg_buf_pools[WICED_BT_CFG_NUM_BUF_PO
     { 300,      10  },      /* Large Buffer Pool  (used for HCI ACL messages) */
     { 700,      2   },      /* Extra Large Buffer Pool - Used for avdt media packets and miscellaneous (if not needed, set buf_count to 0) */
 };
-
-
-

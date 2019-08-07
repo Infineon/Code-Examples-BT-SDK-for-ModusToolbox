@@ -303,7 +303,7 @@ int ams_client_initialize(uint16_t conn_id, uint16_t s_handle, uint16_t e_handle
 
     WICED_SUPPRESS_WARNINGS(ams_client_message_received_callback);
 
-    return TRUE;
+    return WICED_TRUE;
 }
 
 /*

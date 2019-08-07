@@ -70,4 +70,3 @@ extern uint8_t app_bas_battery_level_client_char_config[2];
 extern const uint16_t app_bas_battery_level_client_char_config_len;
 
 #endif /* CYCFG_GATT_DB_H */
-

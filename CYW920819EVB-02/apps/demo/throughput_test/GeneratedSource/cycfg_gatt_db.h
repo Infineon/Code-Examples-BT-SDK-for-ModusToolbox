@@ -81,4 +81,3 @@ extern uint8_t app_tput_notify_descriptor[];
 extern const uint16_t app_tput_notify_descriptor_len;
 
 #endif /* CYCFG_BT_GATT_DB_H */
-

@@ -120,6 +120,20 @@ e93196_usr_cfg_t e93196_usr_cfg =
     }
 };
 
+#if defined(LOW_POWER_NODE) && (LOW_POWER_NODE == 1)
+typedef struct
+{
+    wiced_sleep_config_t   lpn_sleep_config;
+
+// Device LPN state
+#define MESH_LPN_STATE_NOT_IDLE   0
+#define MESH_LPN_STATE_IDLE       1
+    uint8_t                lpn_state;    // LPN state: IDLE or NOT_IDLE
+} mesh_sensor_motion_t;
+
+mesh_sensor_motion_t app_state = { 0 };
+#endif
+
 /******************************************************
  *          Function Prototypes
  ******************************************************/
@@ -144,6 +158,7 @@ static void         mesh_sensor_hci_event_send_setting_set(wiced_bt_mesh_hci_eve
 
 #if defined(LOW_POWER_NODE) && (LOW_POWER_NODE == 1)
 void mesh_sensor_motion_lpn_sleep(uint32_t max_sleep_duration);
+static uint32_t mesh_sensor_motion_sleep_poll(wiced_sleep_poll_type_t type);
 #endif
 /******************************************************
  *          Variables Definitions
@@ -162,6 +177,7 @@ uint32_t      mesh_sensor_fast_publish_period = 0; // publish period in msec whe
 wiced_timer_t mesh_sensor_cadence_timer;
 wiced_timer_t mesh_sensor_presence_detected_timer;
 wiced_bool_t  presence_detected = WICED_FALSE;
+uint32_t      mesh_sensor_sleep_max_time = 0;       // motion sensor max sleep time. unit is ms.
 
 // We define optional setting for the motion sensor, the Motion Threshold. Default is 80%.
 uint8_t       mesh_motion_sensor_threshold_val = 0x50;
@@ -253,7 +269,7 @@ wiced_bt_mesh_core_config_t  mesh_config =
         .receive_window_factor = 2,                                 // contribution of the supported Receive Window used in Friend Offer Delay calculations.
         .min_cache_size_log    = 3,                                 // minimum number of messages that the Friend node can store in its Friend Cache.
         .receive_delay         = 100,                               // Receive delay in 1 ms units to be requested by the Low Power node.
-        .poll_timeout          = 600                                // Poll timeout in 100ms units to be requested by the Low Power node.
+        .poll_timeout          = 36000                              // Poll timeout in 100ms units to be requested by the Low Power node.
     },
 #else
     .features           = WICED_BT_MESH_CORE_FEATURE_BIT_FRIEND | WICED_BT_MESH_CORE_FEATURE_BIT_RELAY | WICED_BT_MESH_CORE_FEATURE_BIT_GATT_PROXY_SERVER,   // In Friend mode support friend, relay
@@ -296,19 +312,21 @@ wiced_bt_mesh_app_func_table_t wiced_bt_mesh_app_func_table =
     mesh_app_factory_reset          // factory reset
 };
 
+wiced_bool_t do_not_init_again = WICED_FALSE;
+
  /******************************************************
  *               Function Definitions
  ******************************************************/
 void mesh_app_init(wiced_bool_t is_provisioned)
 {
-#if 1
+#if 0
     extern uint8_t wiced_bt_mesh_model_trace_enabled;
     wiced_bt_mesh_model_trace_enabled = WICED_TRUE;
 #endif
     wiced_result_t result;
     wiced_bt_mesh_core_config_sensor_t *p_sensor;
 
-    /* This means that device came out of HID off mode and it is not a power cycle */
+    // This means that device came out of HID off mode and it is not a power cycle
     if(wiced_hal_mia_is_reset_reason_por())
     {
         WICED_BT_TRACE("start reason: reset\n");
@@ -323,9 +341,8 @@ void mesh_app_init(wiced_bool_t is_provisioned)
         else
 #endif
         {
-            /* We woke up from hid-off, need to check if we woke because of GPIO */
-            WICED_BT_TRACE("Wake from HID off, interrupt:%d\n",
-                wiced_hal_gpio_get_pin_interrupt_status(e93196_usr_cfg.doci_pin));
+            // Check if we wake up by GPIO
+            WICED_BT_TRACE("Wake from HID off, interrupt:%d\n", wiced_hal_gpio_get_pin_interrupt_status(e93196_usr_cfg.doci_pin));
         }
     }
 
@@ -385,6 +402,29 @@ void mesh_app_init(wiced_bool_t is_provisioned)
     wiced_hal_read_nvram( MESH_MOTION_SENSOR_CADENCE_VSID_START, sizeof(wiced_bt_mesh_sensor_config_cadence_t), (uint8_t*)(&p_sensor->cadence), &result);
 
     wiced_bt_mesh_model_sensor_server_init(MESH_SENSOR_SERVER_ELEMENT_INDEX, mesh_sensor_server_report_handler, mesh_sensor_server_config_change_handler, is_provisioned);
+
+#if defined(LOW_POWER_NODE) && (LOW_POWER_NODE == 1)
+    if (!do_not_init_again)
+    {
+        WICED_BT_TRACE("Init once \n");
+
+        // Configure to sleep as the device is idle now
+        app_state.lpn_sleep_config.sleep_mode = WICED_SLEEP_MODE_NO_TRANSPORT;
+        app_state.lpn_sleep_config.device_wake_mode = WICED_GPIO_BUTTON_WAKE_MODE;
+        app_state.lpn_sleep_config.device_wake_source = WICED_SLEEP_WAKE_SOURCE_GPIO;
+        app_state.lpn_sleep_config.device_wake_gpio_num = e93196_usr_cfg.doci_pin;
+        app_state.lpn_sleep_config.host_wake_mode = WICED_SLEEP_WAKE_ACTIVE_HIGH;
+        app_state.lpn_sleep_config.sleep_permit_handler = mesh_sensor_motion_sleep_poll;
+        app_state.lpn_sleep_config.post_sleep_cback_handler = NULL;
+
+        if (WICED_BT_SUCCESS != wiced_sleep_configure(&app_state.lpn_sleep_config))
+        {
+            WICED_BT_TRACE("Sleep Configure failed\r\n");
+        }
+
+        do_not_init_again = WICED_TRUE;
+    }
+#endif
 }
 
 /*
@@ -437,6 +477,7 @@ void mesh_sensor_server_restart_timer(wiced_bt_mesh_core_config_sensor_t *p_sens
         WICED_BT_TRACE("sensor min interval:%d\n", timeout);
     }
     WICED_BT_TRACE("sensor restart timer:%d\n", timeout);
+    mesh_sensor_sleep_max_time = timeout;
     wiced_start_timer(&mesh_sensor_cadence_timer, timeout);
 }
 
@@ -687,8 +728,65 @@ void mesh_app_factory_reset(void)
 #if defined(LOW_POWER_NODE) && (LOW_POWER_NODE == 1)
 void mesh_sensor_motion_lpn_sleep(uint32_t max_sleep_duration)
 {
-    WICED_BT_TRACE("Entering HID-OFF for max_sleep_duration: %ds\r\n", max_sleep_duration/1000);
-    wiced_sleep_enter_hid_off(max_sleep_duration, e93196_usr_cfg.doci_pin, WICED_GPIO_ACTIVE_HIGH);
-    WICED_BT_TRACE("Entering HID-Off failed\n\r");
+    WICED_BT_TRACE("Mesh core allow max_sleep_duration:%ds configured:%ds presence:%d\n", max_sleep_duration / 1000, mesh_sensor_sleep_max_time / 1000, presence_detected);
+
+    // Currently cannot sleep for more than a minute. It's for better demo.
+    if (max_sleep_duration > 60000)
+        max_sleep_duration = 60000;
+
+    if (mesh_sensor_sleep_max_time != 0)
+    {
+        // If presence is detected we cannot sleep for more than configured period.
+        // Otherwise we can sleep until need to send the next LPN poll
+        if (presence_detected && (mesh_sensor_sleep_max_time < max_sleep_duration))
+            max_sleep_duration = mesh_sensor_sleep_max_time;
+    }
+
+    // We think if sleep timer is bigger than 30mins, then hid-off will save more power. But it's up to your design.
+    if (max_sleep_duration < 1800000)// 30mins
+    {
+        WICED_BT_TRACE("Get ready to go into ePDS sleep, duration=%d\n\r", max_sleep_duration);
+        app_state.lpn_state = MESH_LPN_STATE_IDLE;
+    }
+    else
+    {
+        WICED_BT_TRACE("Get ready to go into HID-OFF, duration=%d\n\r", max_sleep_duration);
+        wiced_sleep_enter_hid_off(max_sleep_duration, e93196_usr_cfg.doci_pin, WICED_GPIO_ACTIVE_HIGH);
+        WICED_BT_TRACE("Entering HID-Off failed\n\r");
+    }
+}
+
+
+/*
+ * Sleep permission polling time to be used by firmware
+ */
+static uint32_t mesh_sensor_motion_sleep_poll(wiced_sleep_poll_type_t type)
+{
+    uint32_t ret = WICED_SLEEP_NOT_ALLOWED;
+
+    switch (type)
+	{
+    case WICED_SLEEP_POLL_TIME_TO_SLEEP:
+        if (app_state.lpn_state == MESH_LPN_STATE_NOT_IDLE)
+        {
+            WICED_BT_TRACE("!");
+            ret = WICED_SLEEP_NOT_ALLOWED;
+        }
+        else
+        {
+            WICED_BT_TRACE("@\n");
+            ret = WICED_SLEEP_MAX_TIME_TO_SLEEP;
+        }
+        break;
+    case WICED_SLEEP_POLL_SLEEP_PERMISSION:
+        if (app_state.lpn_state == MESH_LPN_STATE_IDLE)
+        {
+            WICED_BT_TRACE("#\n");
+            ret = WICED_SLEEP_ALLOWED_WITHOUT_SHUTDOWN;
+        }
+
+        break;
+    }
+    return ret;
 }
 #endif

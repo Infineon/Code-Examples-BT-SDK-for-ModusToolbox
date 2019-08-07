@@ -231,11 +231,18 @@ extern wiced_led_config_t platform_led[];
 wiced_platform_led_t hello_sensor_led_pin = WICED_PLATFORM_LED_1;
 #endif
 
-#if defined(CYW20719B1) || defined(CYW20719B2) || defined(CYW20735B1) || defined(CYW20721B1) || defined(CYW20721B2) || defined(CYW20819A1)
+#if defined(CYW20719B1) || defined(CYW20719B2) || defined(CYW20735B1) || defined(CYW20721B1) || defined(CYW20819A1)
 extern wiced_platform_led_config_t platform_led[];
 extern size_t led_count;
 wiced_platform_led_number_t hello_sensor_led_pin = WICED_PLATFORM_LED_2;
 #endif
+
+#if defined(CYW20721B2) // 721B2 (EVK03 has just one LED)
+extern wiced_platform_led_config_t platform_led[];
+extern size_t led_count;
+wiced_platform_led_number_t hello_sensor_led_pin = WICED_PLATFORM_LED_1;
+#endif
+
 
 wiced_bt_gpio_numbers_t led_pin;
 
@@ -1179,4 +1186,3 @@ static void hello_sensor_load_keys_for_address_resolution( void )
     }
     WICED_BT_TRACE("hello_sensor_load_keys_for_address_resolution %B result:%d \n", p, result );
 }
-

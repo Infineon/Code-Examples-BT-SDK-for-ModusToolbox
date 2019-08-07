@@ -166,9 +166,6 @@ PLACE_DATA_IN_RETENTION_RAM uint8_t  kbapp_funcLock_state; // function lock stat
 extern KbAppConfig kbAppConfig;
 extern KbKeyConfig kbKeyConfig[];
 extern uint8_t kbKeyConfig_size;
-
-extern wiced_bt_cfg_settings_t wiced_bt_hid_cfg_settings;
-extern uint16_t blehostlist_flags;
 extern wiced_bool_t blehidlink_connection_param_updated;
 
 wiced_blehidd_report_gatt_characteristic_t reportModeGattMap[] =
@@ -2339,4 +2336,3 @@ void blekbapp_ota_fw_upgrade_status(uint8_t status)
     }
 }
 #endif /* OTA_FIRMWARE_UPGRADE */
-

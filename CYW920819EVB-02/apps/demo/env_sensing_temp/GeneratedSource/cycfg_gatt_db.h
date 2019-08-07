@@ -113,4 +113,3 @@ extern uint8_t app_fwupgradeservice_fwupgradedata[];
 extern const uint16_t app_fwupgradeservice_fwupgradedata_len;
 
 #endif /* CYCFG_GATT_DB_H */
-

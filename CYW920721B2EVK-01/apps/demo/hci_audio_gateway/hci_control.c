@@ -1078,7 +1078,7 @@ void hci_control_delete_nvram( int nvram_id ,wiced_bool_t from_host)
     hci_control_nvram_chunk_t *p1, *p2;
 
     if ( p_nvram_first == NULL )
-    	return;
+	return;
 
     /* Special case when need to remove the first chunk */
     if ( ( p_nvram_first != NULL ) && ( p_nvram_first->nvram_id == nvram_id ) )

@@ -70,6 +70,7 @@
 #include "wiced_bt_stack.h"
 #include "wiced_bt_sdp.h"
 #include "wiced_bt_trace.h"
+#include <wiced_memory.h>
 #include "wiced_platform.h"
 #include "wiced_memory.h"
 #include "wiced_transport.h"
@@ -214,6 +215,7 @@ static void     map_client_handle_notif_reg(uint8_t *p_data, uint32_t data_len);
 static tlv_t *  wiced_find_tlv(uint8_t *p_data, int data_len, uint8_t type);
 static uint16_t wiced_add_tlv(uint8_t *p_buf, uint8_t type, uint8_t *p_value, uint8_t value_len);
 
+extern int      hci_control_alloc_nvram_id( void );
 extern void     hci_control_device_handle_command( uint16_t cmd_opcode, uint8_t *p_data, uint32_t data_len );
 extern void     hci_control_misc_handle_command( uint16_t cmd_opcode, uint8_t *p_data, uint32_t data_len );
 extern void     hci_control_send_device_started_evt( void );
@@ -260,7 +262,7 @@ wiced_result_t map_client_management_callback(wiced_bt_management_evt_t event, w
     wiced_bt_dev_ble_pairing_info_t   *p_pairing_info;
     wiced_bt_dev_encryption_status_t  *p_encryption_status;
     int                                nvram_id;
-    uint8_t                            pairing_result;
+    uint8_t                             pairing_result;
 
     WICED_BT_TRACE("map_client_management_callback 0x%02x\n", event);
 
@@ -313,7 +315,7 @@ wiced_result_t map_client_management_callback(wiced_bt_management_evt_t event, w
         case BTM_SECURITY_REQUEST_EVT:
             if (pairing_allowed)
             {
-                wiced_bt_ble_security_grant(p_event_data->security_request.bd_addr, WICED_BT_SUCCESS);
+            wiced_bt_ble_security_grant(p_event_data->security_request.bd_addr, WICED_BT_SUCCESS);
             }
             else
             {
@@ -416,7 +418,7 @@ void map_client_write_eir()
     *p++ = BT_EIR_COMPLETE_LOCAL_NAME_TYPE;
     memcpy( p, wiced_bt_cfg_settings.device_name, length );
     p += length;
-    *p++ = (1 * 2 ) + 1;      // length of services + 1
+    *p++ = (1 * 2 ) + 1;     // length of services + 1
     *p++ = BT_EIR_COMPLETE_16BITS_UUID_TYPE;
     *p++ =   UUID_SERVCLASS_MESSAGE_NOTIFICATION        & 0xff;
     *p++ = ( UUID_SERVCLASS_MESSAGE_NOTIFICATION >> 8 ) & 0xff;
@@ -619,33 +621,33 @@ static void map_client_send_hci_data(uint16_t code, uint8_t status, uint8_t *p_d
         }
         else
         {
-            uint8_t *p_temp = p;
+        uint8_t *p_temp = p;
 
-            available_len = HCI_MAX_DATA_LEN - (p - buf) - 2;
+        available_len = HCI_MAX_DATA_LEN - (p - buf) - 2;
 
-            while (data_len)
+        while (data_len)
+        {
+            p = p_temp;
+
+            param_type = HCI_CONTROL_MCE_PARAM_DATA;
+            if (data_len > available_len)
             {
-                p = p_temp;
-
-                param_type = HCI_CONTROL_MCE_PARAM_DATA;
-                if (data_len > available_len)
-                {
-                    send_len = available_len;
-                }
-                else
-                {
-                    send_len = data_len;
-                    if (is_final)
-                        param_type = HCI_CONTROL_MCE_PARAM_DATA_END;
-                }
-                p += wiced_add_tlv(p, param_type, p_data, send_len);
-
-                wiced_transport_send_data(code, buf, p - buf);
-
-                p_data += send_len;
-                data_len -= send_len;
+                send_len = available_len;
             }
+            else
+            {
+                send_len = data_len;
+                if (is_final)
+                    param_type = HCI_CONTROL_MCE_PARAM_DATA_END;
+            }
+            p += wiced_add_tlv(p, param_type, p_data, send_len);
+
+            wiced_transport_send_data(code, buf, p - buf);
+
+            p_data += send_len;
+            data_len -= send_len;
         }
+    }
     }
     else
         wiced_transport_send_data(code, buf, p - buf);

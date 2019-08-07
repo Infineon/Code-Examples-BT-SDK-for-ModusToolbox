@@ -272,6 +272,3 @@ extern const wiced_bt_cfg_settings_t hci_ag_cfg_settings;
 extern const wiced_bt_cfg_buf_pool_t hci_ag_cfg_buf_pools[];
 extern const wiced_bt_audio_config_buffer_t hci_ag_audio_buf_config;
 #endif /* BTA_HS_INT_H */
-
-
-

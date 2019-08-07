@@ -253,4 +253,3 @@ void mesh_level_process_set_level(uint8_t element_idx, wiced_bt_mesh_level_statu
 {
     WICED_BT_TRACE("level srv set idx:%d level:%d present:%d\n", element_idx, p_status->target_level, p_status->present_level, p_status->remaining_time);
 }
-

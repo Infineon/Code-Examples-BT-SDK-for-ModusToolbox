@@ -639,4 +639,3 @@ wiced_bool_t app_read_link_keys(wiced_bt_device_link_keys_t *p_keys)
     WICED_BT_TRACE("read %d bytes at id:%d\n", bytes_read, OTA_FW_UPGRADE_PEER_DEVICE_KEYS_VS_ID);
     return (bytes_read == sizeof (wiced_bt_device_link_keys_t));
 }
-

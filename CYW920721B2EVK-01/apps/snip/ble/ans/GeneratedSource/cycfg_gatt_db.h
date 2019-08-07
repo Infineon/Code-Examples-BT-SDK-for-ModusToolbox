@@ -98,4 +98,3 @@ extern uint8_t app_ans_alert_notification_control_point[];
 extern const uint16_t app_ans_alert_notification_control_point_len;
 
 #endif /* __GATT_DATABASE_H__ */
-

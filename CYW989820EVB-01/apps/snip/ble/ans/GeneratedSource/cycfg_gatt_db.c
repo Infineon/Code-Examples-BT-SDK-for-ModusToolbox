@@ -100,4 +100,3 @@ const uint16_t app_ans_supported_unread_alert_category_len = (sizeof(app_ans_sup
 const uint16_t app_ans_unread_alert_status_len = (sizeof(app_ans_unread_alert_status));
 const uint16_t app_ans_unread_alert_status_client_char_config_len = (sizeof(app_ans_unread_alert_status_client_char_config));
 const uint16_t app_ans_alert_notification_control_point_len = (sizeof(app_ans_alert_notification_control_point));
-

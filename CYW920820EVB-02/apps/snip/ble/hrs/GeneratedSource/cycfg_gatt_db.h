@@ -128,4 +128,3 @@ extern uint8_t app_dis_system_id[];
 extern const uint16_t app_dis_system_id_len;
 
 #endif /* __GATT_DATABASE_H__ */
-

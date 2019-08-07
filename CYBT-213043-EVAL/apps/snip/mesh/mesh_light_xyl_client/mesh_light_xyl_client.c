@@ -480,6 +480,3 @@ void mesh_light_xyl_hci_event_send_default_status(wiced_bt_mesh_hci_event_t *p_h
 }
 
 #endif
-
-
-

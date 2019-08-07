@@ -189,7 +189,7 @@ void hci_control_ag_sco_management_callback( wiced_bt_management_evt_t event, wi
 
         case BTM_SCO_CONNECTION_REQUEST_EVT:    /**< SCO connection request event. Event data: #wiced_bt_sco_connection_request_t */
             WICED_BT_TRACE( "Got BTM_SCO_CONNECTION_REQUEST_EVT: sco_idx: %u  %B  %C 0x%02x\n", p_event_data->sco_connection_request.sco_index,
-            		p_event_data->sco_connection_request.bd_addr, p_event_data->sco_connection_request.dev_class, p_event_data->sco_connection_request.link_type );
+			p_event_data->sco_connection_request.bd_addr, p_event_data->sco_connection_request.dev_class, p_event_data->sco_connection_request.link_type );
 
             if ( ( p_scb = hci_control_ag_find_scb_by_sco_index( p_event_data->sco_connection_request.sco_index ) ) != NULL )
             {
@@ -245,5 +245,3 @@ void hci_control_cn_timeout ( uint32_t scb )
 
     hci_control_ag_sco_create ( p_scb, WICED_TRUE );
 }
-
-

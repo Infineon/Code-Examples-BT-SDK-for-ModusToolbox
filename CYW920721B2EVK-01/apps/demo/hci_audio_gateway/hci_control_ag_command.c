@@ -613,4 +613,3 @@ void hci_control_ag_parse_AT_command (hci_control_ag_session_cb_t *p_scb)
 
     p_scb->res_len = 0;
 }
-

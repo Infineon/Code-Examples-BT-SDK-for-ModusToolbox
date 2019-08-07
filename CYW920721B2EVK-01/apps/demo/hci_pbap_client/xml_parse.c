@@ -1555,4 +1555,3 @@ static BOOLEAN xml_etag_elem(tXML_MUL_STATE *p_st)
 
     return TRUE;
 }
-

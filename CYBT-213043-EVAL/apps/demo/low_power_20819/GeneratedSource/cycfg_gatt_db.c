@@ -75,4 +75,3 @@ const uint16_t app_gap_device_name_len = (sizeof(app_gap_device_name));
 const uint16_t app_gap_appearance_len = (sizeof(app_gap_appearance));
 const uint16_t app_bas_battery_level_len = (sizeof(app_bas_battery_level));
 const uint16_t app_bas_battery_level_client_char_config_len = (sizeof(app_bas_battery_level_client_char_config));
-

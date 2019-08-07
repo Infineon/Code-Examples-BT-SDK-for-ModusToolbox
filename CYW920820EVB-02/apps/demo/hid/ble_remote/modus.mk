@@ -1,3 +1,7 @@
+# This is a file used and owned by the ModusToolbox IDE. Users should not modify this file.
+OSNS=
+FEATURE_VALUES=BT_DEVICE_ADDRESS,default UART,AUTO ENABLE_DEBUG,0 TESTING_USING_HCI,1 OTA_FW_UPGRADE,1 OTA_SEC_FW_UPGRADE,0 ENABLE_TOUCHPAD,0 ENABLE_AUDIO,1 ENABLE_DIGITAL_MIC,0 ENABLE_IR,0 ENABLE_MOTION,0 OPUS_CELT_ENCODER,0 ADPCM_ENCODER,0 AUTO_RECONNECT,0 SKIP_PARAM_UPDATE,1 ENABLE_EASY_PAIR,0 START_ADV_ON_POWERUP,0 ENABLE_CONNECTED_ADV,0 DISCONNECTED_ENDLESS_ADV,1 ENABLE_FINDME,0 POLL_MOTION_WHILE_CONNECTED,1 ENABLE_MOTION_AS_AIR_MOUSE,0 ASSYMETRIC_SLAVE_LATENCY,0
+DEVICE=CYW20820A1KFBG
 #
 # Copyright 2019, Cypress Semiconductor Corporation or a subsidiary of
 # Cypress Semiconductor Corporation. All Rights Reserved.
@@ -30,7 +34,7 @@
 # of such system or application assumes all risk of such use and in doing
 # so agrees to indemnify Cypress against all liability.
 #
-TOOLCHAIN = GCC
+TOOLCHAIN=GCC
 
 PLATFORMS_VERSION = 1.0
 
@@ -149,14 +153,17 @@ CY_APP_DEFINES = \
 CY_APP_PATCH_LIBS += wiced_hidd_lib.a
 
 ifeq ($(TESTING_USING_HCI),1)
-CY_APP_DEFINES += -DTESTING_USING_HCI
+ CY_APP_DEFINES += -DTESTING_USING_HCI
 endif
+
 ifeq ($(ENABLE_SCROLL),1)
-CY_APP_DEFINES += -DSUPPORT_SCROLL
+ CY_APP_DEFINES += -DSUPPORT_SCROLL
 endif
+
 ifeq ($(ASSYMETRIC_SLAVE_LATENCY),1)
-CY_APP_DEFINES += -DASSYM_SLAVE_LATENCY
+ CY_APP_DEFINES += -DASSYM_SLAVE_LATENCY
 endif
+
 ifeq ($(OPUS_CELT_ENCODER), 1)
  #use OPUS CELT encoder
  CY_APP_DEFINES += -DCELT_ENCODER
@@ -174,12 +181,15 @@ else
  #CY_APP_DEFINES += -DSFLASH_SIZE_2M_BITS
  endif
 endif
+
 ifeq ($(SKIP_PARAM_UPDATE),1)
-CY_APP_DEFINES += -DSKIP_CONNECT_PARAM_UPDATE_EVEN_IF_NO_PREFERED
+ CY_APP_DEFINES += -DSKIP_CONNECT_PARAM_UPDATE_EVEN_IF_NO_PREFERED
 endif
+
 ifeq ($(AUTO_RECONNECT),1)
-CY_APP_DEFINES += -DAUTO_RECONNECT
+ CY_APP_DEFINES += -DAUTO_RECONNECT
 endif
+
 ifeq ($(ENABLE_AUDIO),1)
  CY_APP_DEFINES += -DSUPPORT_AUDIO
  # send audio data as 1 big gatt packet
@@ -190,23 +200,30 @@ ifeq ($(ENABLE_AUDIO),1)
   CY_APP_PATCH_LIBS += adc_audio_lib.a
  endif
 endif # ENABLE_AUDIO
+
 ifeq ($(ENABLE_EASY_PAIR),1)
-CY_APP_DEFINES += -DEASY_PAIR
+ CY_APP_DEFINES += -DEASY_PAIR
 endif
+
 ifeq ($(START_ADV_ON_POWERUP),1)
-CY_APP_DEFINES += -DSTART_ADV_WHEN_POWERUP_NO_CONNECTED
+ CY_APP_DEFINES += -DSTART_ADV_WHEN_POWERUP_NO_CONNECTED
 endif
+
 ifeq ($(ENABLE_CONNECTED_ADV),1)
-CY_APP_DEFINES += -DCONNECTED_ADVERTISING_SUPPORTED
+ CY_APP_DEFINES += -DCONNECTED_ADVERTISING_SUPPORTED
 endif
+
 ifeq ($(DISCONNECTED_ENDLESS_ADV),1)
-CY_APP_DEFINES += -DENDLESS_LE_ADVERTISING_WHILE_DISCONNECTED
+ CY_APP_DEFINES += -DENDLESS_LE_ADVERTISING_WHILE_DISCONNECTED
+ CY_APP_DEFINES += -DSUPPORT_EPDS
 endif
+
 ifeq ($(ENABLE_FINDME),1)
-CY_APP_DEFINES += -DSUPPORTING_FINDME
+ CY_APP_DEFINES += -DSUPPORTING_FINDME
 endif
+
 ifeq ($(ENABLE_DIGITAL_MIC),1)
-CY_APP_DEFINES += -DSUPPORT_DIGITAL_MIC
+ CY_APP_DEFINES += -DSUPPORT_DIGITAL_MIC
 endif
 
 # NOTE: This variable cannot be renamed or moved to a different file. It is updated by the ModusToolbox
@@ -216,10 +233,9 @@ CY_MAINAPP_SWCOMP_USED = \
 
 #enable OTA Firmware Update
 ifeq ($(OTA_FW_UPGRADE),1)
-CY_APP_DEFINES += -DOTA_FIRMWARE_UPGRADE
-CY_APP_DEFINES += -DOTA_SKIP_CONN_PARAM_UPDATE
-
-CY_MAINAPP_SWCOMP_USED += \
+ CY_APP_DEFINES += -DOTA_FIRMWARE_UPGRADE
+ CY_APP_DEFINES += -DOTA_SKIP_CONN_PARAM_UPDATE
+ CY_MAINAPP_SWCOMP_USED += \
   $(CY_WICED_LIB_COMP_BASE)/BT-SDK/common/libraries/fw_upgrade_lib
 endif # OTA_FW_UPGRADE
 
@@ -256,30 +272,30 @@ CY_APP_SOURCE = \
   ./touchpad/touchPad.h
 
 ifeq ($(OTA_SEC_FW_UPGRADE),1)
-ifneq ($(OTA_FW_UPGRADE),1)
-$(error setting OTA_SEC_FW_UPGRADE=1 requires OTA_FW_UPGRADE also set to 1)
-else
-CY_APP_DEFINES += -DOTA_SECURE_FIRMWARE_UPGRADE
-endif # ifneq OTA_FW_UPGRADE
+ ifneq ($(OTA_FW_UPGRADE),1)
+  $(error setting OTA_SEC_FW_UPGRADE=1 requires OTA_FW_UPGRADE also set to 1)
+ else
+  CY_APP_DEFINES += -DOTA_SECURE_FIRMWARE_UPGRADE
+ endif # ifneq OTA_FW_UPGRADE
 endif # OTA_SEC_FW_UPGRADE
 
 ifeq ($(ENABLE_IR),1)
-CY_APP_DEFINES += -DSUPPORT_IR
+ CY_APP_DEFINES += -DSUPPORT_IR
 endif
 
 ifeq ($(ENABLE_MOTION),1)
-CY_APP_DEFINES += -DSUPPORT_MOTION
-ifeq ($(POLL_MOTION_WHILE_CONNECTED),1)
-CY_APP_DEFINES += -DPOLL_MOTION_WHILE_CONNECTED_AND_ACTIVE
-endif
-ifeq ($(ENABLE_MOTION_AS_AIR_MOUSE),1)
-CY_APP_DEFINES += -DUSE_MOTION_AS_AIR_MOUSE
-CY_APP_PATCH_LIBS += air_motion.a
-endif
+ CY_APP_DEFINES += -DSUPPORT_MOTION
+ ifeq ($(POLL_MOTION_WHILE_CONNECTED),1)
+  CY_APP_DEFINES += -DPOLL_MOTION_WHILE_CONNECTED_AND_ACTIVE
+ endif
+ ifeq ($(ENABLE_MOTION_AS_AIR_MOUSE),1)
+  CY_APP_DEFINES += -DUSE_MOTION_AS_AIR_MOUSE
+  CY_APP_PATCH_LIBS += air_motion.a
+ endif
 endif # ENABLE_MOTION
 
 ifeq ($(ENABLE_TOUCHPAD),1)
-CY_APP_DEFINES += -DSUPPORT_TOUCHPAD
+ CY_APP_DEFINES += -DSUPPORT_TOUCHPAD
 endif
 
 CY_APP_RESOURCES =
@@ -288,11 +304,11 @@ CY_APP_RESOURCES =
 CY_APP_PATH := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 # handle cygwin drive/path mangling for GNU tools - replace /cygdrive/c/ with c:/
 ifneq ($(findstring cygdrive,$(CY_APP_PATH)),)
-CY_APP_PATH := $(subst /, ,$(patsubst /cygdrive/%,%,$(CY_APP_PATH)))
-CY_APP_PATH := $(subst $(empty) $(empty),/,$(patsubst %,%:,$(firstword $(CY_APP_PATH))) $(wordlist 2,$(words $(CY_APP_PATH)),$(CY_APP_PATH)))
+ CY_APP_PATH := $(subst /, ,$(patsubst /cygdrive/%,%,$(CY_APP_PATH)))
+ CY_APP_PATH := $(subst $(empty) $(empty),/,$(patsubst %,%:,$(firstword $(CY_APP_PATH))) $(wordlist 2,$(words $(CY_APP_PATH)),$(CY_APP_PATH)))
 endif
 
 ifndef CYSDK
-$(error The SDK must be defined via the CYSDK environment variable)
+ $(error The SDK must be defined via the CYSDK environment variable)
 endif
 include $(CYSDK)/libraries/platforms-$(PLATFORMS_VERSION)/common/find_platform.mk

@@ -93,4 +93,3 @@ extern uint8_t app_dis_software_revision_string[];
 extern const uint16_t app_dis_software_revision_string_len;
 
 #endif /* __GATT_DATABASE_H__ */
-

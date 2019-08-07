@@ -1898,4 +1898,3 @@ void hci_control_le_send_write_completed( uint16_t con_handle, uint8_t result )
 
     wiced_transport_send_data ( HCI_CONTROL_GATT_EVENT_WRITE_RESPONSE, tx_buf, ( int )( p - tx_buf ) );
 }
-

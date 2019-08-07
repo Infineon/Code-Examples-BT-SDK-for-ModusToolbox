@@ -262,4 +262,3 @@ static void ias_led_timer_cb(uint32_t arg)
 }
 
 /* [] END OF FILE */
-

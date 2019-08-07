@@ -307,4 +307,3 @@ void hci_control_ag_rfcomm_acceptor_opened( hci_control_ag_session_cb_t *p_scb )
     /* continue with common open processing */
     hci_control_ag_rfcomm_opened( p_scb );
 }
-

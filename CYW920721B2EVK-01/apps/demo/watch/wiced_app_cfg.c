@@ -417,4 +417,3 @@ uint16_t wiced_app_cfg_sdp_record_get_size(void)
 {
     return (uint16_t)sizeof(wiced_app_cfg_sdp_record);
 }
-

@@ -320,4 +320,3 @@ BLE_CONFIG_END
 #endif /* CYCFG_BT_H */
 
 /* [] END OF FILE */
-

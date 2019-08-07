@@ -25,6 +25,8 @@ When the selected GPIO pin is left unconnected, the output will capture environm
 
 Please refer to the datasheet for more electrical specifications of ADC like Full scale voltage, Bandgap reference.,etc.
 
+Note: For CYW920721B2EVK-03 and CYW920721B2EVK-01 boards, put the switch in SW4 corresponding to LED1 to off position.
+
 Usage
 - Follow the prompts printed on the terminal
 -------------------------------------------------------------------------------

@@ -1082,4 +1082,3 @@ void ans_handle_get_version(void)
 
     wiced_transport_send_data(HCI_CONTROL_MISC_EVENT_VERSION, tx_buf, cmd);
 }
-

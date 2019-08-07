@@ -35,7 +35,7 @@ CYW920819EVB-02:
 CYBT-213043-MESH
     35-SMT package, PIR sensor (motion detection), Ambient Light Sensor and thermistor,
     user switches and RGB LEDs, with additional 1MB External Serial Flash.
-    CYW20819-based dual-mode (BLE/BR/EDR) Bluetooth 5.0 with SIG MESH Qualified Module, 
+    CYW20819-based dual-mode (BLE/BR/EDR) Bluetooth 5.0 with SIG MESH Qualified Module,
     FCC, ISED, MIC, and CE Certified Module.
     USB connector for power, programming and USB-UART bridge.
     Note: Max UART baud rate is 1M. Use baud rate of 115200 for Client Control.
@@ -55,7 +55,7 @@ CYW989820EVB-01:
 CYBT-213043-EVAL
     35-SMT package, Arduino compatible headers. CYW20819-based dual-mode (BLE/BR/EDR)
     Bluetooth 5.0-compliant fully certified module (CYBT-213043-02).
-    Note: Max UART baud rate is 1M. Use baud rate of 921600 for Client Control.
+    Note: Max UART baud rate is 1M. Use baud rate of 115200 for Client Control.
     For more information, see - http://www.cypress.com/CYBT-213043-EVAL
 
 Software Tools
@@ -149,7 +149,7 @@ Downloading application to kit
 ------------------------------
 If you have issues downloading to the kit, follow the steps below -
 - Press and hold the 'Recover' button on the kit.
-- Press and hold the 'Reset' button on the kit. 
+- Press and hold the 'Reset' button on the kit.
 - Release the 'Reset' button.
 - After one second, release the 'Recover' button.
 
@@ -159,7 +159,7 @@ Over The Air (OTA) Firmware Upgrade
 -----------------------------------
 Application that support OTA upgrade can be updated via peer OTA apps located in the folder -
 <Install Dir>\ModusToolbox_1.1\libraries\bt_sdk-1.x\components\BT-SDK\common\peer_apps\ota_firmware_upgrade
-See the readme.txt file located in the above folder for instructions. 
+See the readme.txt file located in the above folder for instructions.
 To generate OTA image for the app, append command line OTA_FW_UPGRADE=1 to the build, for example
 > make PLATFORM=CYW920819EVB-02 OTA_FW_UPGRADE=1
 This will generate <app>.bin file in the 'build' folder.

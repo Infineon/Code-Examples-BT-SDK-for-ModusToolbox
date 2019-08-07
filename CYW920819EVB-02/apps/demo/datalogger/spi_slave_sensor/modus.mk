@@ -43,7 +43,6 @@ CY_EXAMPLE_DESCRIPTION =  This application demonstrates how to use SPI driver in
 CY_SHOW_NEW_PROJECT := true
 
 CY_VALID_PLATFORMS = CYW920819EVB-02
-
 PLATFORM = CYW920819EVB-02
 
 # NOTE: This variable cannot be renamed or moved to a different file. It is updated by the

@@ -93,4 +93,3 @@ const uint16_t app_dis_manufacturer_name_string_len = (sizeof(app_dis_manufactur
 const uint16_t app_dis_model_number_string_len = (sizeof(app_dis_model_number_string));
 const uint16_t app_dis_firmware_revision_string_len = (sizeof(app_dis_firmware_revision_string));
 const uint16_t app_dis_software_revision_string_len = (sizeof(app_dis_software_revision_string));
-

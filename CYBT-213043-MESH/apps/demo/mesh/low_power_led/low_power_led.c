@@ -34,13 +34,12 @@
 /** @file
  *
  * This demo application shows an implementation of a low_power_led system.
- * The app uses On/Off control because PWM is not supported in the low power states.
  * The app is based on the snip/mesh/mesh_power_onoff_server sample which implements generic BLE Mesh Power Onoff Server model.
  *
  * Features demonstrated
  * - showcase a LPN + Server as well as a Friend node implementation in conjunction with the Proxy/Relay + Server (3x Lightbulb).
  *
- * See chip specific readme for more information about the BT SDK.
+ * See chip specific readme.txt for more information about the BT SDK.
  *
  * To demonstrate the app, work through the following steps.
  * 1. Build and download the application (to the WICED board)
@@ -91,6 +90,20 @@ extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
 /******************************************************
  *          Structures
  ******************************************************/
+typedef struct
+{
+    uint8_t         present_onoff;
+    uint8_t         target_onoff;
+#if defined(LOW_POWER_NODE) && (LOW_POWER_NODE == 1)
+    wiced_sleep_config_t   lpn_sleep_config;
+    wiced_timer_t          lpn_wake_timer;
+
+// Device LPN state
+#define MESH_LPN_STATE_NOT_IDLE   0
+#define MESH_LPN_STATE_IDLE       1
+    uint8_t                lpn_state;    // LPN state: IDLE or NOT_IDLE
+#endif
+} mesh_low_power_led_t;
 
 /******************************************************
  *          Function Prototypes
@@ -100,6 +113,9 @@ static void mesh_low_power_led_message_handler(uint8_t element_idx, uint16_t eve
 static void mesh_low_power_led_process_status(uint8_t element_idx, wiced_bt_mesh_onoff_status_data_t *p_data);
 #if defined(LOW_POWER_NODE) && (LOW_POWER_NODE == 1)
 void mesh_low_power_led_lpn_sleep(uint32_t duration);
+static uint32_t mesh_low_power_led_sleep_poll(wiced_sleep_poll_type_t type);
+static void wakeup_timer_cb(TIMER_PARAM_TYPE arg);
+
 #endif
 
 /******************************************************
@@ -109,6 +125,7 @@ uint8_t mesh_mfr_name[WICED_BT_MESH_PROPERTY_LEN_DEVICE_MANUFACTURER_NAME]      
 uint8_t mesh_model_num[WICED_BT_MESH_PROPERTY_LEN_DEVICE_MODEL_NUMBER]              = { '1', '2', '3', '4', 0, 0, 0, 0 };
 uint8_t mesh_prop_fw_version[WICED_BT_MESH_PROPERTY_LEN_DEVICE_FIRMWARE_REVISION]   = { '0', '6', '.', '0', '2', '.', '0', '5' }; // this is overwritten during init
 uint8_t mesh_system_id[8]                                                           = { 0xbb, 0xb8, 0xa1, 0x80, 0x5f, 0x9f, 0x91, 0x71 };
+mesh_low_power_led_t app_state = { 0 };
 
 wiced_bt_mesh_core_config_model_t   mesh_element1_models[] =
 {
@@ -208,13 +225,14 @@ wiced_bt_mesh_app_func_table_t wiced_bt_mesh_app_func_table =
     NULL,                   // notify period set
     NULL,                   // WICED HCI command
 #if defined(LOW_POWER_NODE) && (LOW_POWER_NODE == 1)
-    mesh_low_power_led_lpn_sleep, // LPN sleep
+    mesh_low_power_led_lpn_sleep,// LPN sleep
 #else
     NULL,
 #endif
     NULL                    // factory reset
 };
 
+wiced_bool_t do_not_init_again = WICED_FALSE;
 
 /******************************************************
  *               Function Definitions
@@ -226,6 +244,26 @@ void mesh_app_init(wiced_bool_t is_provisioned)
     wiced_bt_mesh_model_trace_enabled = WICED_TRUE;
 #endif
     wiced_result_t  result;
+
+    // This means that device came out of HID off mode and it is not a power cycle
+    if(wiced_hal_mia_is_reset_reason_por())
+    {
+        WICED_BT_TRACE("start reason: reset\n");
+    }
+    else
+    {
+#if CYW20819A1
+        if(wiced_hal_mia_is_reset_reason_hid_timeout())
+        {
+            WICED_BT_TRACE("Wake from HID off: timed wake\n");
+        }
+        else
+#endif
+        {
+            // Check if we wake up by GPIO
+            WICED_BT_TRACE("Wake from HID off, interrupt:%d\n", wiced_hal_gpio_get_pin_interrupt_status(WICED_GPIO_PIN_BUTTON));
+        }
+    }
 
 #if defined(LOW_POWER_NODE) && (LOW_POWER_NODE == 1)
     wiced_bt_cfg_settings.device_name = (uint8_t *)"Low Power LED";
@@ -268,6 +306,31 @@ void mesh_app_init(wiced_bool_t is_provisioned)
     led_control_init(LED_CONTROL_TYPE_ONOFF);
 
     wiced_bt_mesh_model_power_onoff_server_init(MESH_LOW_POWER_LED_ELEMENT_INDEX, mesh_low_power_led_message_handler, TRANSITION_INTERVAL, is_provisioned);
+
+#if defined(LOW_POWER_NODE) && (LOW_POWER_NODE == 1)
+    if (!do_not_init_again)
+    {
+        WICED_BT_TRACE("Init once \n");
+
+        // Configure to sleep as the device is idle now
+        app_state.lpn_sleep_config.sleep_mode = WICED_SLEEP_MODE_NO_TRANSPORT;
+        app_state.lpn_sleep_config.device_wake_mode = WICED_GPIO_BUTTON_WAKE_MODE;
+        app_state.lpn_sleep_config.device_wake_source = WICED_SLEEP_WAKE_SOURCE_GPIO;
+        app_state.lpn_sleep_config.device_wake_gpio_num = WICED_GPIO_PIN_BUTTON;
+        app_state.lpn_sleep_config.host_wake_mode = WICED_SLEEP_WAKE_ACTIVE_HIGH;
+        app_state.lpn_sleep_config.sleep_permit_handler = mesh_low_power_led_sleep_poll;
+        app_state.lpn_sleep_config.post_sleep_cback_handler = NULL;
+
+        if (WICED_BT_SUCCESS != wiced_sleep_configure(&app_state.lpn_sleep_config))
+        {
+            WICED_BT_TRACE("Sleep Configure failed\r\n");
+        }
+
+        wiced_init_timer(&app_state.lpn_wake_timer, wakeup_timer_cb, 0, WICED_MILLI_SECONDS_TIMER);
+
+        do_not_init_again = WICED_TRUE;
+    }
+#endif
 }
 
 /*
@@ -303,10 +366,66 @@ void mesh_low_power_led_process_status(uint8_t element_idx, wiced_bt_mesh_onoff_
 #if defined(LOW_POWER_NODE) && (LOW_POWER_NODE == 1)
 void mesh_low_power_led_lpn_sleep(uint32_t max_sleep_duration)
 {
-    WICED_BT_TRACE("Entering HID-OFF for max_sleep_duration:%ds\n", max_sleep_duration/1000);
-    if (WICED_SUCCESS != wiced_sleep_enter_hid_off(max_sleep_duration, WICED_GPIO_PIN_BUTTON, 1))
+    // Generally speaking, if sleep timer bigger than 2mins, then hid-off will save more power. But it's up to your design.
+    if (max_sleep_duration < 120000)//2mins
     {
-        WICED_BT_TRACE("Entering HID-Off failed\n");
+        wiced_stop_timer(&app_state.lpn_wake_timer);
+        wiced_start_timer(&app_state.lpn_wake_timer, max_sleep_duration);
+        WICED_BT_TRACE("Get ready to go into ePDS sleep, duration=%d\n\r", max_sleep_duration);
+        app_state.lpn_state = MESH_LPN_STATE_IDLE;
     }
+    else
+    {
+        WICED_BT_TRACE("Entering HID-OFF for max_sleep_duration: %d\r\n", max_sleep_duration);
+        if (WICED_SUCCESS != wiced_sleep_enter_hid_off(max_sleep_duration, WICED_GPIO_PIN_BUTTON, 1))
+        {
+            WICED_BT_TRACE("Entering HID-Off failed\n\r");
+        }
+    }
+}
+
+/*
+ * wakeup timer callback.
+ * ePDS is default sleep mode(current is about 10uA).
+ */
+static void wakeup_timer_cb(TIMER_PARAM_TYPE arg)
+{
+    WICED_BT_TRACE("ePDS wake up!!!\n");
+    app_state.lpn_state = MESH_LPN_STATE_NOT_IDLE;
+    wiced_stop_timer(&app_state.lpn_wake_timer);
+}
+
+
+/*
+ * Sleep permission polling time to be used by firmware
+ */
+static uint32_t mesh_low_power_led_sleep_poll(wiced_sleep_poll_type_t type)
+{
+    uint32_t ret = WICED_SLEEP_NOT_ALLOWED;
+
+    switch (type)
+    {
+    case WICED_SLEEP_POLL_TIME_TO_SLEEP:
+        if (app_state.lpn_state == MESH_LPN_STATE_NOT_IDLE)
+        {
+            WICED_BT_TRACE("!");
+            ret = WICED_SLEEP_NOT_ALLOWED;
+        }
+        else
+        {
+            WICED_BT_TRACE("@\n");
+            ret = WICED_SLEEP_MAX_TIME_TO_SLEEP;
+        }
+        break;
+    case WICED_SLEEP_POLL_SLEEP_PERMISSION:
+        if (app_state.lpn_state == MESH_LPN_STATE_IDLE)
+        {
+            WICED_BT_TRACE("#\n");
+            ret = WICED_SLEEP_ALLOWED_WITHOUT_SHUTDOWN;
+        }
+
+        break;
+    }
+    return ret;
 }
 #endif

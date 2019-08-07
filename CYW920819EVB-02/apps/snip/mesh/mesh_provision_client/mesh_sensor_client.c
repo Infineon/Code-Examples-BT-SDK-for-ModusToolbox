@@ -104,57 +104,65 @@ void mesh_sensor_client_message_handler(uint8_t element_idx, uint16_t addr, uint
         WICED_BT_TRACE("tx complete\n");
         break;
 
-    case WICED_BT_MESH_SENSOR_DESCRIPTOR_STATUS:
 #if defined HCI_CONTROL
+    case WICED_BT_MESH_SENSOR_DESCRIPTOR_STATUS:
         if ((p_hci_event = wiced_bt_mesh_alloc_hci_event(element_idx)) != NULL)
-            mesh_sensor_desc_hci_event_send(p_hci_event, (wiced_bt_mesh_sensor_descriptor_status_data_t *)p_data);
-#endif
+        {
+            p_hci_event->src = addr;
+            mesh_sensor_desc_hci_event_send(p_hci_event, (wiced_bt_mesh_sensor_descriptor_status_data_t*)p_data);
+        }
         break;
 
     case WICED_BT_MESH_SENSOR_STATUS:
-#if defined HCI_CONTROL
         if ((p_hci_event = wiced_bt_mesh_alloc_hci_event(element_idx)) != NULL)
-            mesh_sensor_data_hci_event_send(p_hci_event, (wiced_bt_mesh_sensor_status_data_t *)p_data);
-#endif
+        {
+            p_hci_event->src = addr;
+            mesh_sensor_data_hci_event_send(p_hci_event, (wiced_bt_mesh_sensor_status_data_t*)p_data);
+        }
         break;
 
     case WICED_BT_MESH_SENSOR_COLUMN_STATUS:
-#if defined HCI_CONTROL
         if ((p_hci_event = wiced_bt_mesh_alloc_hci_event(element_idx)) != NULL)
-            mesh_sensor_column_hci_event_send(p_hci_event, (wiced_bt_mesh_sensor_column_status_data_t *)p_data);
-#endif
+        {
+            p_hci_event->src = addr;
+            mesh_sensor_column_hci_event_send(p_hci_event, (wiced_bt_mesh_sensor_column_status_data_t*)p_data);
+        }
         break;
 
     case WICED_BT_MESH_SENSOR_SERIES_STATUS:
-#if defined HCI_CONTROL
         if ((p_hci_event = wiced_bt_mesh_alloc_hci_event(element_idx)) != NULL)
-            mesh_sensor_series_hci_event_send(p_hci_event, (wiced_bt_mesh_sensor_series_status_data_t *)p_data);
-#endif
+        {
+            p_hci_event->src = addr;
+            mesh_sensor_series_hci_event_send(p_hci_event, (wiced_bt_mesh_sensor_series_status_data_t*)p_data);
+        }
         break;
 
     case WICED_BT_MESH_SENSOR_CADENCE_STATUS:
-#if defined HCI_CONTROL
         if ((p_hci_event = wiced_bt_mesh_alloc_hci_event(element_idx)) != NULL)
-            mesh_sensor_cadence_hci_event_send(p_hci_event, (wiced_bt_mesh_sensor_cadence_status_data_t *)p_data);
-#endif
+        {
+            p_hci_event->src = addr;
+            mesh_sensor_cadence_hci_event_send(p_hci_event, (wiced_bt_mesh_sensor_cadence_status_data_t*)p_data);
+        }
         break;
 
     case WICED_BT_MESH_SENSOR_SETTINGS_STATUS:
-#if defined HCI_CONTROL
         if ((p_hci_event = wiced_bt_mesh_alloc_hci_event(element_idx)) != NULL)
-            mesh_sensor_settings_hci_event_send(p_hci_event, (wiced_bt_mesh_sensor_settings_status_data_t *)p_data);
-#endif
+        {
+            p_hci_event->src = addr;
+            mesh_sensor_settings_hci_event_send(p_hci_event, (wiced_bt_mesh_sensor_settings_status_data_t*)p_data);
+        }
         break;
 
     case WICED_BT_MESH_SENSOR_SETTING_STATUS:
-#if defined HCI_CONTROL
         if ((p_hci_event = wiced_bt_mesh_alloc_hci_event(element_idx)) != NULL)
-            mesh_sensor_setting_hci_event_send(p_hci_event, (wiced_bt_mesh_sensor_setting_status_data_t *)p_data);
-#endif
+        {
+            p_hci_event->src = addr;
+            mesh_sensor_setting_hci_event_send(p_hci_event, (wiced_bt_mesh_sensor_setting_status_data_t*)p_data);
+        }
         break;
-
+#endif
     default:
-        WICED_BT_TRACE("unknown\n");
+        WICED_BT_TRACE("not processed\n");
         break;
     }
 }
@@ -350,7 +358,6 @@ void mesh_sensor_cadence_get(wiced_bt_mesh_event_t *p_event, uint8_t *p_data, ui
     {
         get_data.property_id = 0;
     }
-
     wiced_bt_mesh_model_sensor_client_sensor_cadence_send_get(p_event, &get_data);
 }
 

@@ -393,4 +393,3 @@ BLE_CONFIG_END
 #endif /* WICED_BT_CFG_H */
 
 /* [] END OF FILE */
-

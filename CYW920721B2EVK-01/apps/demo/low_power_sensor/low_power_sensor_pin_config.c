@@ -91,4 +91,3 @@ const wiced_platform_gpio_config_t platform_gpio[] =
     };
 
 const size_t gpio_count = (sizeof(platform_gpio) / sizeof(wiced_platform_gpio_config_t));
-

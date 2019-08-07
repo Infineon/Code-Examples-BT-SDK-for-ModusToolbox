@@ -321,4 +321,3 @@ extern void hci_control_delete_nvram( int nvram_id ,wiced_bool_t from_host);
 extern void wiced_bt_pbc_close_hdlr();
 extern BOOLEAN wiced_bt_pbc_get_phonebook(uint16_t opcode, UINT16 max_list_count, UINT16 list_start_offset, BOOLEAN is_reset_miss_calls);
 extern void wiced_bt_pbc_abort_hdlr();
-

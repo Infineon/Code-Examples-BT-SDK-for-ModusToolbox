@@ -80,4 +80,3 @@ const uint16_t app_gatt_db_ext_attr_tbl_size = (sizeof(app_gatt_db_ext_attr_tbl)
 const uint16_t app_gap_device_name_len = (sizeof(app_gap_device_name));
 const uint16_t app_gap_appearance_len = (sizeof(app_gap_appearance));
 const uint16_t app_ias_alert_level_len = (sizeof(app_ias_alert_level));
-

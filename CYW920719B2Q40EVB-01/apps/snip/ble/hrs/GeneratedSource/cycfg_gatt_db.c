@@ -123,4 +123,3 @@ const uint16_t app_dis_software_revision_string_len = (sizeof(app_dis_software_r
 const uint16_t app_dis_serial_number_string_len = (sizeof(app_dis_serial_number_string));
 const uint16_t app_dis_hardware_revision_string_len = (sizeof(app_dis_hardware_revision_string));
 const uint16_t app_dis_system_id_len = (sizeof(app_dis_system_id));
-

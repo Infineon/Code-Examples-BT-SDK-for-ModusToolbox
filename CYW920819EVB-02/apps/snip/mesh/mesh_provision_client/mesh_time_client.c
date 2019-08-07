@@ -127,8 +127,6 @@ uint32_t mesh_time_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t
 {
     wiced_bt_mesh_event_t *p_event;
 
-    WICED_BT_TRACE("[%s] cmd_opcode 0x%02x\n", __FUNCTION__, opcode);
-
     switch (opcode)
     {
     case HCI_CONTROL_MESH_COMMAND_TIME_GET:
@@ -146,6 +144,8 @@ uint32_t mesh_time_client_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t
         return WICED_FALSE;
     }
     p_event = wiced_bt_mesh_create_event_from_wiced_hci(opcode, MESH_COMPANY_ID_BT_SIG, WICED_BT_MESH_CORE_MODEL_ID_TIME_CLNT, &p_data, &length);
+
+    WICED_BT_TRACE("time client hci opcode %x event:%x\n", opcode, p_event);
     if (p_event == NULL)
     {
         WICED_BT_TRACE("bad hdr\n");
@@ -298,8 +298,6 @@ void mesh_time_status_hci_event_send(wiced_bt_mesh_hci_event_t *p_hci_event, wic
 {
     uint8_t *p = p_hci_event->data;
 
-    WICED_BT_TRACE("%s\n", __FUNCTION__);
-
     UINT40_TO_STREAM(p, p_time_status->tai_seconds);
     UINT8_TO_STREAM(p, p_time_status->subsecond);
     UINT8_TO_STREAM(p, p_time_status->uncertainty);
@@ -307,12 +305,12 @@ void mesh_time_status_hci_event_send(wiced_bt_mesh_hci_event_t *p_hci_event, wic
     UINT16_TO_STREAM(p, p_time_status->tai_utc_delta_current);
     UINT8_TO_STREAM(p, p_time_status->time_zone_offset_current);
 
-    WICED_BT_TRACE("TAI_seconds: %x\n", p_time_status->tai_seconds);
+    WICED_BT_TRACE("TAI_seconds:%02x%08x\n", (uint32_t)(p_time_status->tai_seconds >> 32), (uint32_t)(p_time_status->tai_seconds & 0xFFFFFFFF));
     WICED_BT_TRACE("subsecond: %x\n", p_time_status->subsecond);
     WICED_BT_TRACE("uncertainty: %x\n", p_time_status->uncertainty);
     WICED_BT_TRACE("auth: %x\n", p_time_status->time_authority);
     WICED_BT_TRACE("tai_utc_delta_current: %x\n", p_time_status->tai_utc_delta_current);
-    WICED_BT_TRACE("time_zone_offset_current: %x\n",p_time_status->time_zone_offset_current);
+    WICED_BT_TRACE("time_zone_offset_current: %x\n", p_time_status->time_zone_offset_current);
 
     mesh_transport_send_data(HCI_CONTROL_MESH_EVENT_TIME_STATUS, (uint8_t *)p_hci_event, (uint16_t)(p - (uint8_t *)p_hci_event));
 }

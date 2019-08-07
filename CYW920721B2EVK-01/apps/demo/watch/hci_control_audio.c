@@ -58,7 +58,7 @@
 #endif
 #include "wiced_bt_a2d.h"
 #include "wiced_transport.h"
-#if ( defined(CYW20706A2) || defined(CYW20719B1) || defined(CYW43012C0) || defined(CYW20721B1) || defined(CYW20819A1) )
+#if ( defined(CYW20706A2) || defined(CYW20719B1) || defined(CYW43012C0) || defined(CYW20721B1) || defined(CYW20721B2) || defined(CYW20819A1) )
 #include "wiced_bt_event.h"
 #endif
 
@@ -119,6 +119,7 @@ typedef struct
     uint8_t             sep_configured_for_streaming;
 
     wiced_bt_avdt_sep_info_t *sep_info;      /* stream discovery results */
+    wiced_bt_avdt_cfg_t  *avdt_sep_config;
     tAV_SEP_INFO        av_sep_info[sizeof(supported_av_codecs)];
 
 } tAV_APP_CB;
@@ -530,6 +531,8 @@ static void av_app_getcap_cmpl( uint8_t handle, BD_ADDR bd_addr, uint8_t event, 
     /* check the getcap complete response status */
     if ( p_data->getcap_cfm.hdr.err_code != AVDT_SUCCESS )
     {
+        wiced_bt_free_buffer(av_app_cb.avdt_sep_config);
+        av_app_cb.avdt_sep_config = NULL;
         WICED_BT_TRACE( "[%s]: ERROR: getcap status = %d", __FUNCTION__, p_data->getcap_cfm.hdr.err_code );
         /* TODO: getcap failed, report error to someone? Disconnect? */
         return;
@@ -576,7 +579,7 @@ static void av_app_getcap_cmpl( uint8_t handle, BD_ADDR bd_addr, uint8_t event, 
 
     /* Free allocation made for the the getcap call */
     wiced_bt_free_buffer(p_data->getcap_cfm.p_cfg);
-
+    av_app_cb.avdt_sep_config = NULL;
 #ifdef WICED_BT_TRACE_ENABLE
     /* dump the SEP information for all indices */
     WICED_BT_TRACE( "[%s]: getcap complete info... state: %s", __FUNCTION__, dump_state_name(av_app_cb.state) );
@@ -678,6 +681,8 @@ static void av_app_disc_results (uint8_t handle, BD_ADDR bd_addr, uint8_t event,
     if (p_discover->hdr.err_code != AVDT_SUCCESS)
     {
         WICED_BT_TRACE( "[%s]: ERROR: discover status = %d", __FUNCTION__, p_discover->hdr.err_code);
+        wiced_bt_free_buffer(av_app_cb.sep_info);
+        av_app_cb.sep_info = NULL;
         av_app_disconnect_connection();
         return;
     }
@@ -716,13 +721,6 @@ static void av_app_disc_results (uint8_t handle, BD_ADDR bd_addr, uint8_t event,
     /* store number of stream endpoints returned */
     av_app_cb.peer_num_seps = p_discover->num_seps;
 
-    /* save the pointer to the SEP information from the discover */
-    if (av_app_cb.sep_info != NULL)
-    {
-        wiced_bt_free_buffer(av_app_cb.sep_info);
-    }
-    av_app_cb.sep_info = p_discover->p_sep_info;
-
     /* trace all discovered SEPs */
     WICED_BT_TRACE( "[%s]: Peer Num SEPs: = %d", __FUNCTION__, p_discover->num_seps );
     for (i = 0; i < p_discover->num_seps; i++)
@@ -748,6 +746,16 @@ static void av_app_disc_results (uint8_t handle, BD_ADDR bd_addr, uint8_t event,
     {
         /* Allocate space for the sink SEP capabilities. */
         avdt_sep_config = (wiced_bt_avdt_cfg_t *)wiced_bt_get_buffer(sizeof(wiced_bt_avdt_cfg_t));
+
+        /* Free Previous allocated buffer if not freed*/
+        if (av_app_cb.avdt_sep_config != NULL)
+        {
+            wiced_bt_free_buffer(av_app_cb.avdt_sep_config);
+        }
+
+        /* Save allocated buffer pointer */
+        av_app_cb.avdt_sep_config = avdt_sep_config;
+
         if (avdt_sep_config != NULL)
         {
             /* clear the audio SEP */
@@ -808,6 +816,27 @@ static void av_app_disconnect_event_hdlr( uint8_t handle, BD_ADDR bd_addr, uint8
     av_app_cb.state = AV_STATE_IDLE;
 
     WICED_BT_TRACE( "[%s]: handle:%04x\n\r", __FUNCTION__, av_app_cb.avdt_handle );
+
+    /* If SDP in progress, stop and deallocate memory */
+    if (av_app_cb.p_sdp_db != NULL)
+    {
+        wiced_bt_sdp_cancel_service_search(av_app_cb.p_sdp_db);
+        wiced_bt_free_buffer(av_app_cb.p_sdp_db);
+        av_app_cb.p_sdp_db = NULL;
+    }
+
+    /* Check and free all allocated buffers */
+    if (av_app_cb.sep_info != NULL)
+    {
+        wiced_bt_free_buffer(av_app_cb.sep_info);
+        av_app_cb.sep_info = NULL;
+    }
+
+    if (av_app_cb.avdt_sep_config != NULL)
+    {
+        wiced_bt_free_buffer(av_app_cb.avdt_sep_config);
+        av_app_cb.avdt_sep_config = NULL;
+    }
 
     /* Reset the stream configured flag */
     av_app_cb.is_host_streaming = WICED_FALSE;
@@ -1135,7 +1164,12 @@ static void av_app_proc_stream_evt( uint8_t handle, BD_ADDR bd_addr, uint8_t eve
             av_app_cb.is_accepter = WICED_TRUE;
 
             /* Do SDP to get peer version info */
-            av_app_initiate_sdp(bd_addr);
+            if ( av_app_initiate_sdp(bd_addr) != WICED_SUCCESS)
+            {
+                // Peer SDP failed so assume that peer SDP version is 1.2
+                av_app_cb.peer_avdt_version = AVDT_VERSION_1_2;
+                av_app_connect_event_hdlr( av_app_cb.avdt_handle, av_app_cb.peer_bda);
+            }
         }
         break;
 
@@ -1303,8 +1337,15 @@ static wiced_result_t av_app_send_discover_req( void )
 
     WICED_BT_TRACE( "[%s] state: %d\n\r", __FUNCTION__, av_app_cb.state );
 
+    if (av_app_cb.sep_info != NULL)
+    {
+        wiced_bt_free_buffer(av_app_cb.sep_info);
+    }
     /* Allocate space for the discovery results */
     p_sep_info = (wiced_bt_avdt_sep_info_t *)wiced_bt_get_buffer(discover_size);
+
+    /* Store the allocated pointer */
+    av_app_cb.sep_info = p_sep_info;
     if (p_sep_info != NULL)
     {
         status = WICED_SUCCESS;
@@ -1745,8 +1786,17 @@ void av_app_sdp_cback( uint16_t sdp_result )
 
     if ( WICED_SUCCESS != status )
     {
-        av_app_cb.state = AV_STATE_IDLE;
-        hci_control_audio_send_connect_complete( av_app_cb.peer_bda, status, 0 );
+        if (av_app_cb.is_accepter == WICED_FALSE)
+        {
+             av_app_cb.state = AV_STATE_IDLE;
+             hci_control_audio_send_connect_complete( av_app_cb.peer_bda, status, 0 );
+        }
+        else
+        {
+            // Peer SDP failed so assume that peer SDP version is 1.2
+            av_app_cb.peer_avdt_version = AVDT_VERSION_1_2;
+            av_app_connect_event_hdlr( av_app_cb.avdt_handle, av_app_cb.peer_bda);
+        }
     }
 }
 
@@ -2129,11 +2179,10 @@ void av_app_init( void )
     /* Application control block memory init*/
     if ( av_app_memInit( ) )
     {
-    	hci_control_audio_init();
+	hci_control_audio_init();
         avdt_init( );
         av_app_start( ); /* start the application */
     }
 
     WICED_BT_TRACE ("[%s] exit\n", __FUNCTION__ );
 }
-

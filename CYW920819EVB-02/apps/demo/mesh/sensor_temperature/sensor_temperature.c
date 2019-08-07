@@ -665,4 +665,3 @@ void mesh_sensor_server_process_setting_changed(uint8_t element_idx, uint16_t pr
 {
     WICED_BT_TRACE("settings changed  property id of sensor = %x , sensor prop id = %x \n", property_id, setting_property_id);
 }
-

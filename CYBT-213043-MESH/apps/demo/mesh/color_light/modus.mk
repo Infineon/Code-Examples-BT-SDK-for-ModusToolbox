@@ -37,7 +37,7 @@ PLATFORMS_VERSION = 1.0
 
 CONFIG = Debug
 
-CY_EXAMPLE_NAME = BLE_Mesh_Light_HSL_Server
+CY_EXAMPLE_NAME = BLE_Mesh_Color_Light
 
 CY_EXAMPLE_DESCRIPTION = This application demonstrates how to create a BLE Mesh device that implements the Light HSL server model, a dimmable light that allows hue and saturation adjustments.
 

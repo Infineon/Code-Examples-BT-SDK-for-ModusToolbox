@@ -89,4 +89,3 @@ const uint16_t app_gap_appearance_len = (sizeof(app_gap_appearance));
 const uint16_t app_fwupgradeservice_fwupgradecontolpoint_len = (sizeof(app_fwupgradeservice_fwupgradecontolpoint));
 const uint16_t app_fwupgradeservice_fwupgradecontolpoint_client_char_config_len = (sizeof(app_fwupgradeservice_fwupgradecontolpoint_client_char_config));
 const uint16_t app_fwupgradeservice_fwupgradedata_len = (sizeof(app_fwupgradeservice_fwupgradedata));
-

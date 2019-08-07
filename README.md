@@ -6,11 +6,11 @@ These examples demonstrate the functionality of following devices:
 - CYW20819A1 chip: CYW920819EVB-02, CYBT-213043-MESH, CYBT-213043-EVAL
 - CYW20820A1 chip: CYW920820EVB-02, CYW989820EVB-01
 - CYW20721B2 chip: CYW920721B2EVK-01
-- CYW20719B2 chip: CYW920719B2Q40EVB-01
+- CYW20719B2 chip: CYW920719B2Q40EVB-01, CYW920719B2Q40EVB-03
 
 Each example has a readme.txt that explains what do and what to observe when running the example. Also review the chip specific readme.txt for an overvivew of the BT SDK features and tools.
 
-See BTSDK-1.3-CodeExamples.pdf for details of applications and supported devices.
+See BT-SDK-1.4.pdf for details of applications and supported devices.
 
 Apps in the 'demo' folder are reference applications and more complex in nature. Apps in the 'snips' folder demonstrate a specific feature or library. These examples support ModusToolbox v1.1. They do not work with ModusToolbox v1.0.
 

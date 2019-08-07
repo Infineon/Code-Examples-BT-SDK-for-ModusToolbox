@@ -6,7 +6,7 @@ Overview
 --------
 The Cypress CYW20719 is an ultra-low-power dual-mode Bluetooth 5.0 wireless
 MCU device. It has a stand-alone baseband processor with an integrated 2.4 GHz
-transceiver supporting BR/EDR/BLE.  
+transceiver supporting BR/EDR/BLE.
 
 SDK Software Features
 ----------------------
@@ -107,7 +107,7 @@ Downloading application to kit
 ------------------------------
 If you have issues downloading to the kit, follow the steps below -
 - Press and hold the 'Recover' button on the kit.
-- Press and hold the 'Reset' button on the kit. 
+- Press and hold the 'Reset' button on the kit.
 - Release the 'Reset' button.
 - After one second, release the 'Recover' button.
 

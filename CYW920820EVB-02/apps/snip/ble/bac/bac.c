@@ -648,18 +648,18 @@ static void battery_client_scan_result_cback( wiced_bt_ble_scan_results_t *p_sca
     wiced_bool_t            ret_status;
     uint8_t                 length;
     uint8_t *               p_data;
-    uint16_t                battery_service_uuid = UUID_SERVICE_BATTERY;
-    uint16_t                service_uuid16;
+    uint16_t                service_uuid16=0;
 
     if ( p_scan_result )
     {
-        // Search for SERVICE_UUID_16 element in the Advertisement data received
+        // Search for SERVICE_UUID_16 element in the Advertisement data received.Check for both
+        // complete and partial list
         p_data = wiced_bt_ble_check_advertising_data( p_adv_data, BTM_BLE_ADVERT_TYPE_16SRV_COMPLETE, &length );
-
         if ( p_data == NULL )
         {
-            // No UUID_16 element
-            return;
+            p_data = wiced_bt_ble_check_advertising_data( p_adv_data, BTM_BLE_ADVERT_TYPE_16SRV_PARTIAL, &length );
+            if (p_data == NULL)
+                return;     // No UUID_16 element
         }
 
         while (length >= LEN_UUID_16)
@@ -952,4 +952,3 @@ static wiced_bool_t battery_client_is_device_bonded( wiced_bt_device_address_t b
     }
     return WICED_FALSE;
 }
-

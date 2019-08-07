@@ -66,7 +66,7 @@ endif # PLATFORM
 ifneq ($(filter CYW920819EVB-02 CYW920820EVB-02 CYBT-213043-EVAL CYW989820EVB-01,$(PLATFORM)),)
 endif # PLATFORM
 
-ifneq ($(filter CYW920721B2EVK-01 CYW920719B2Q40EVB-01,$(PLATFORM)),)
+ifneq ($(filter CYW920721B2EVK-01 CYW920721B2EVK-03 CYW920719B2Q40EVB-01,$(PLATFORM)),)
 endif # PLATFORM
 
 # NOTE: This variable cannot be renamed or moved to a different file. It is updated by the ModusToolbox

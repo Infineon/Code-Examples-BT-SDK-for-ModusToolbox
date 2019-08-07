@@ -246,4 +246,3 @@ wiced_bt_gatt_status_t app_gatt_callback( wiced_bt_gatt_evt_t event, wiced_bt_ga
     return status;
 }
 */
-

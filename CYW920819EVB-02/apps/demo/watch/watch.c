@@ -1776,4 +1776,3 @@ static void hci_control_transport_status( wiced_transport_type_t type )
     WICED_BT_TRACE( " hci_control_transport_status %x \n", type );
     hci_control_send_device_started_evt();
 }
-

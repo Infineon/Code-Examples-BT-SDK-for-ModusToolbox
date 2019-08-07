@@ -118,4 +118,3 @@ typedef enum
 }hello_sensor_mode_t;
 
 #endif // _LOW_POWER_SENSOR_H_
-

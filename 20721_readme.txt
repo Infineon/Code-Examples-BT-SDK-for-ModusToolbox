@@ -6,7 +6,7 @@ Overview
 --------
 The Cypress CYW20721 is an ultra-low-power dual-mode Bluetooth 5.0 wireless
 MCU device. It has a stand-alone baseband processor with an integrated 2.4 GHz
-transceiver supporting BR/EDR/BLE.  
+transceiver supporting BR/EDR/BLE.
 
 SDK Software Features
 ----------------------
@@ -21,10 +21,12 @@ SDK Software Features
 
 Kits
 ----
-CYW920721B2EVK-01:
+CYW920721B2EVK-01 & CYW920721B2EVK-03:
     40-QFN package, Arduino compatible headers, 9-axis motion sensor and thermistor,
     user switches and LEDs, USB connector for power, programming and USB-UART bridge.
-    Note: Max UART baud rate is 3M
+    Note: (1) Max UART baud rate is 3M
+          (2) HW debugging is not supported on CYW920721B2EVK-03.
+          (3) Device configurator is not supported for CYW920721B2EVK-01 or CYW920721B2EVK-03.
 
 Software Tools
 --------------
@@ -91,12 +93,13 @@ ENABLE_DEBUG
     PUART RX/TX signals are shared with SWDCK and SWDIO. Remove RX and TX jumpers on J10
     when using SWD. PUART and SWD cannot be used simultaneously on this board unless these
     pins are changed from the default configuration.
+    CYW920721B2EVK-03: HW debugging is not supported on this board.
 
 Downloading application to kit
 ------------------------------
 If you have issues downloading to the kit, follow the steps below -
 - Press and hold the 'Recover' button on the kit.
-- Press and hold the 'Reset' button on the kit. 
+- Press and hold the 'Reset' button on the kit.
 - Release the 'Reset' button.
 - After one second, release the 'Recover' button.
 

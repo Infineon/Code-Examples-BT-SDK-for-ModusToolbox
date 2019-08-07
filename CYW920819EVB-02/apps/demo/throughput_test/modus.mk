@@ -56,7 +56,6 @@ APP_FEATURES= \
 	VERBOSE_THROUGHPUT_OUTPUT,app,enum,$(VERBOSE_THROUGHPUT_OUTPUT_DEFAULT),0,1
 
 CY_VALID_PLATFORMS = CYW920819EVB-02
-
 PLATFORM = CYW920819EVB-02
 
 # NOTE: This variable cannot be renamed or moved to a different file. It is updated by the ModusToolbox

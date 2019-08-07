@@ -40,4 +40,3 @@
  2. Build and download the application (See CYW920819EVB-02 Kit User Guide).
  3. Use Terminal emulation tools like Teraterm to view the log/trace messages (See CYW920819EVB-02 Kit User Guide).
  4. The user can notice the raw sample values and voltage values in the terminal emulation tool.
-

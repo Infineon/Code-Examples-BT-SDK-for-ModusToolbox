@@ -174,4 +174,3 @@ gatt_db_lookup_table_t* tput_get_attribute(uint16_t handle)
 #endif
     return NULL;
 }
-

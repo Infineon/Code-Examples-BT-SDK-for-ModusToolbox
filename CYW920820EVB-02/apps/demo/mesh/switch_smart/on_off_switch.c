@@ -195,4 +195,3 @@ void mesh_onoff_client_message_handler(uint16_t event, wiced_bt_mesh_event_t *p_
     }
     wiced_bt_mesh_release_event(p_event);
 }
-

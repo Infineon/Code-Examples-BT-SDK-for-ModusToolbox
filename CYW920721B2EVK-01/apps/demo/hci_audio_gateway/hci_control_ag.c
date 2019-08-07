@@ -339,4 +339,3 @@ void hci_control_send_ag_event( uint16_t evt, uint16_t handle, hci_control_ag_ev
 
     wiced_transport_send_data( evt, tx_buf, ( int ) ( p - tx_buf ) );
 }
-

@@ -487,4 +487,3 @@ void mesh_light_lc_hci_event_send_property_status(wiced_bt_mesh_hci_event_t *p_h
 }
 
 #endif
-

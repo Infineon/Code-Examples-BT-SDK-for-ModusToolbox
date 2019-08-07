@@ -105,6 +105,17 @@ CY_APP_PATCH_LIBS += wiced_transport_spi_lib.a
 endif
 endif # PLATFORM
 
+ifeq ($(PLATFORM),CYW920721B2EVK-01)
+CY_APP_PATCH_LIBS = wiced_audio_source_lib.a
+endif # PLATFORM
+
+ifeq ($(PLATFORM),CYW920719B2Q40EVB-01)
+CY_APP_PATCH_LIBS = wiced_audio_source_lib.a
+endif # PLATFORM
+
+ifeq ($(PLATFORM),CYW920721B2EVK-03)
+CY_APP_PATCH_LIBS = wiced_audio_source_lib.a
+endif # PLATFORM
 
 ifeq ($(PLATFORM),CYW943012EVB-04-BT)
 CY_APP_DEFINES += -DWICED_HCI_BAUDRATE=115200

@@ -52,4 +52,3 @@ extern const uint8_t pincode[WICED_PIN_CODE_LEN];
 #define WICED_APP_ANCS_INCLUDED             WICED_TRUE
 #define WICED_APP_TEST_INCLUDED             WICED_TRUE
 #endif /* _WICED_APP_H_ */
-

@@ -167,5 +167,3 @@ extern void hci_control_ag_audio_close( uint16_t handle );
 #endif
 
 #endif /* HF_CONTROL_H */
-
-
