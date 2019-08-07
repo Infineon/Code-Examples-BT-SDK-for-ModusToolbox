@@ -1,4 +1,4 @@
-# Code-Examples-BTSDK-1.3-for-ModusToolbox
+# Code-Examples-BTSDK-1.4-for-ModusToolbox
 
 ## Overview
 These examples demonstrate the functionality of following devices:
