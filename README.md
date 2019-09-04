@@ -5,7 +5,7 @@ These examples demonstrate the functionality of following devices:
 
 - CYW20819A1 chip: CYW920819EVB-02, CYBT-213043-MESH, CYBT-213043-EVAL
 - CYW20820A1 chip: CYW920820EVB-02, CYW989820EVB-01
-- CYW20721B2 chip: CYW920721B2EVK-01, CYW920719B2Q40EVB-03
+- CYW20721B2 chip: CYW920721B2EVK-01, CYW920721B2EVK-03
 - CYW20719B2 chip: CYW920719B2Q40EVB-01
 
 Each example has a readme.txt that explains what do and what to observe when running the example. Also review the chip specific readme.txt for an overvivew of the BT SDK features and tools.
