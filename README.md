@@ -12,7 +12,7 @@ Each example has a readme.txt that explains what do and what to observe when run
 
 See BT-SDK-1.4.pdf for details of applications and supported devices.
 
-Apps in the 'demo' folder are reference applications and more complex in nature. Apps in the 'snips' folder demonstrate a specific feature or library. These examples support ModusToolbox v1.1. They do not work with ModusToolbox v1.0.
+Apps in the 'demo' folder are reference applications and more complex in nature. Apps in the 'snips' folder demonstrate a specific feature or library. **These examples support ModusToolbox v1.1. They do not work with ModusToolbox v1.0 or ModusToolbox v2.0**
 
 ModusToolbox 1.1 can be installed from this link: https://community.cypress.com/community/modustoolbox
 
