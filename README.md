@@ -3,10 +3,9 @@
 ## Overview
 These examples demonstrate the functionality of following devices:
 
-- CYW20819A1 chip: CYW920819EVB-02, CYBT-213043-MESH, CYBT-213043-EVAL
-- CYW20820A1 chip: CYW920820EVB-02, CYW989820EVB-01
-- CYW20721B2 chip: CYW920721B2EVK-01, CYW920721B2EVK-03
-- CYW20719B2 chip: CYW920719B2Q40EVB-01
+- CYW20819A1 chip: [CYW920819EVB-02](http://www.cypress.com/CYW920819EVB-02), [CYBT-213043-MESH](https://www.cypress.com/documentation/development-kitsboards/cybt-213043-mesh-ez-bt-module-mesh-evaluation-kit), [CYBT-213043-EVAL](https://www.cypress.com/part/cybt-213043-eval)
+- CYW20820A1 chip: [CYW920820EVB-02](http://www.cypress.com/CYW920820EVB-02)
+- CYW20721B2 chip: [CYW920721B2EVK-01](http://www.cypress.com/CYW920721B2Q40EVK-01)
 
 Each example has a readme.txt that explains what do and what to observe when running the example. Also review the chip specific readme.txt for an overvivew of the BT SDK features and tools.
 
