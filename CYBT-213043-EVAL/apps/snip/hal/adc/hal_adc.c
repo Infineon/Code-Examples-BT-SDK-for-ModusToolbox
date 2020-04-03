@@ -273,5 +273,3 @@ static UINT32 convert_adc_raw_to_mvolt(INT16 raw_val)
 
     return (uint32_t)mvolt;
 }
-
-

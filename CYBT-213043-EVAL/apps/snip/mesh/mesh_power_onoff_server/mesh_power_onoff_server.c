@@ -54,9 +54,11 @@ extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
  *          Constants
  ******************************************************/
 #define MESH_PID                0x301A
-#define MESH_VID                0x0001
+#define MESH_VID                0x0002
 #define MESH_FWID               0x301A000101010001
 #define MESH_CACHE_REPLAY_SIZE  0x0008
+
+#define TRANSITION_INTERVAL     100     // receive status notifications every 100ms during transition to new state
 
 /******************************************************
  *          Structures
@@ -68,7 +70,7 @@ extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
 static void mesh_app_init(wiced_bool_t is_provisioned);
 static uint32_t mesh_app_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length);
 static void mesh_power_onoff_server_message_handler(uint8_t element_idx, uint16_t event, void *p_data);
-static void mesh_onoff_process_set(uint8_t element_idx, wiced_bt_mesh_onoff_status_data_t *p_status);
+static void mesh_onoff_process_status(uint8_t element_idx, wiced_bt_mesh_onoff_status_data_t *p_status);
 static void mesh_onoff_hci_event_send_set(wiced_bt_mesh_hci_event_t *p_hci_event, wiced_bt_mesh_onoff_set_data_t *p_data);
 
 /******************************************************
@@ -199,7 +201,7 @@ void mesh_app_init(wiced_bool_t is_provisioned)
         wiced_bt_mesh_set_raw_scan_response_data(num_elem, adv_elem);
     }
 
-    wiced_bt_mesh_model_power_onoff_server_init(MESH_POWER_ONOFF_SETUP_SERVER_ELEMENT_INDEX, mesh_power_onoff_server_message_handler, is_provisioned);
+    wiced_bt_mesh_model_power_onoff_server_init(MESH_POWER_ONOFF_SETUP_SERVER_ELEMENT_INDEX, mesh_power_onoff_server_message_handler, TRANSITION_INTERVAL, is_provisioned);
 }
 
 /*
@@ -212,12 +214,15 @@ void mesh_power_onoff_server_message_handler(uint8_t element_idx, uint16_t event
 #endif
     switch (event)
     {
-    case WICED_BT_MESH_ONOFF_SET:
+    case WICED_BT_MESH_ONOFF_STATUS:
 #if defined HCI_CONTROL
 //        if ((p_hci_event = wiced_bt_mesh_create_hci_event(p_event)) != NULL)
 //            mesh_onoff_hci_event_send_set(p_hci_event, (wiced_bt_mesh_onoff_set_data_t *)p_data);
 #endif
-        mesh_onoff_process_set(element_idx, (wiced_bt_mesh_onoff_status_data_t *)p_data);
+        mesh_onoff_process_status(element_idx, (wiced_bt_mesh_onoff_status_data_t *)p_data);
+        break;
+
+    case WICED_BT_MESH_ONOFF_SET:
         break;
 
     default:
@@ -252,7 +257,7 @@ uint32_t mesh_app_proc_rx_cmd(uint16_t opcode, uint8_t *p_data, uint32_t length)
 /*
  * Sample implementation of the command from the on/off client to set the state
  */
-void mesh_onoff_process_set(uint8_t element_idx, wiced_bt_mesh_onoff_status_data_t *p_status)
+void mesh_onoff_process_status(uint8_t element_idx, wiced_bt_mesh_onoff_status_data_t *p_status)
 {
     WICED_BT_TRACE("onoff srv set onoff: present:%d target:%d remaining:%d\n", p_status->present_onoff, p_status->target_onoff, p_status->remaining_time);
 }

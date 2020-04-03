@@ -52,6 +52,11 @@
 #define SENSOR_SHUTDOWN 2
 typedef uint8_t MotionSensorICM_mode_t;
 
+enum {
+    MOTION_NO_EVENTS,
+    MOTION_EVENT_AVAILABLE,
+};
+
 #pragma pack(1)
 #ifdef USE_MOTION_AS_AIR_MOUSE
 /// Data mouse with 8 bit X/Y

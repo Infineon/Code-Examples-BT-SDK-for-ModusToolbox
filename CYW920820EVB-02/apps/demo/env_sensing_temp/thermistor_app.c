@@ -34,11 +34,10 @@
 /** @file
  *  thermistor_app.c
  *
- *  Version: 1.0
+ *  Version: 1.1
  *
  *  Related Document:
- *   1. CE226300 - BLE Environment Sensing Temperature with CYW20819.
- *   2. CYW920819EVB-02 Evaluation Kit User Guide.
+ *    CE226300 - BLE Environment Sensing Temperature with CYW20819.
  *
  *  @brief
  *  This file contains the starting point of thermistor application.
@@ -53,7 +52,6 @@
  *                               Includes
  ******************************************************************************/
 #include "GeneratedSource/cycfg_gatt_db.h"
-#include "thermistor_temp_db.h"
 #include "thermistor_gatt_handler.h"
 #include "thermistor_util_functions.h"
 #include "wiced_bt_ble.h"
@@ -64,7 +62,8 @@
 #include "wiced_hal_gpio.h"
 #include "wiced_timer.h"
 #include "wiced_bt_stack.h"
-#if ( defined(CYW20706A2) || defined(CYW20719B1) || defined(CYW20719B0) || defined(CYW20721B1) || defined(CYW20735B0) || defined(CYW43012C0) )
+#if ( defined(CYW20706A2) || defined(CYW20719B1) || defined(CYW20719B0) || \
+      defined(CYW20721B1) || defined(CYW20735B0) || defined(CYW43012C0) )
 #include "wiced_bt_app_common.h"
 #endif
 #include "wiced.h"
@@ -78,21 +77,29 @@
  */
 #define POLL_TIMER_IN_MS         (5000)
 
-/* 1.85V is used instead of 1.8V because of +/-5% inaccuracy */
-#define VREF_THRESHOLD_1P85      (1850)
-
-#ifdef CYW20819A1
-#define THERMISTOR_PIN      ADC_INPUT_P8        /* P8 - A0 */
-static char *pin_name   =  "ADC_INPUT_P8";
+/* Absolute value of an integer. The absolute value is always positive. */
+#ifndef ABS
+#define ABS(N) ((N<0)?(-N):(N))
 #endif
 
+/*
+ * The OTA library contains functionality to support both secure and non-secure
+ * versions of the upgrade. In the non-secure version, a simple CRC32
+ * Verification is performed to validate that all bytes that have been sent from
+ * the device performing the upgrade are correctly saved in the device flash.
+ * The secure version of the upgrade validates that the OTA image is correctly
+ * signed and has correct production information in the header. This ensures
+ * that unknown firmware is not uploaded to your device.
+ */
 #ifdef OTA_SECURE_FIRMWARE_UPGRADE
 #include "bt_types.h"
 #include "p_256_multprecision.h"
 #include "p_256_ecc_pp.h"
 
-/* If secure version of the OTA firmware upgrade is used, the app should be linked with the ecdsa256_pub.c
-   which exports the public key */
+/*
+ * If secure version of the OTA firmware upgrade is used, the app should be
+ * linked with the ecdsa256_pub.c which exports the public key.
+ */
 extern Point    ecdsa256_public_key;
 #endif
 
@@ -134,10 +141,9 @@ static void thermistor_app_init(void);
  application_start
 
  Function Description:
- @brief    Starting point of your application. Entry point to the application.
-           Set device configuration and start BT stack initialization.
-           The actual application initialization will happen when stack reports
-           that BT device is ready.
+ @brief    Entry point to the application. Set device configuration and start
+           BT stack initialization. The actual application initialization will
+           happen when stack reports that BT device is ready.
 
  @param void
 
@@ -162,12 +168,14 @@ void application_start(void)
  thermistor_management_callback
 
  Function Description:
- @brief  Callback function that will be invoked by application_start()
+ @brief  Bluetooth Management Event callback function registered by
+         application_start() This function acts like a Finite State Machine(FSM)
+         for the application.
 
  @param  event           Bluetooth management event type
- @param  p_event_data    Pointer to the the bluetooth management event data
+ @param  p_event_data    Pointer to the bluetooth management event data
 
- @return        BT status of the callback function
+ @return  wiced_bt_dev_status_t BT status of the callback function
  */
 static wiced_bt_dev_status_t thermistor_management_callback(
                                 wiced_bt_management_evt_t event,
@@ -186,10 +194,10 @@ static wiced_bt_dev_status_t thermistor_management_callback(
                         " CE226300 BLE Environmental Sensing Service Application \n\r\n\r"
                         "---------------------------------------------------------\n\r"
                         "This application measures voltage on the selected DC channel\r\n"
-                        "(%s) every %d milliseconds (configurable) and displays the\r\n"
-                        "voltage across Thermistor and the measured temperature via PUART. \n\r"
+                        "every %d milliseconds (configurable) and displays\r\n"
+                        "the measured temperature via PUART. \n\r"
                         "---------------------------------------------------------\n\r"
-                        , pin_name, POLL_TIMER_IN_MS);
+                        , POLL_TIMER_IN_MS);
 
         WICED_BT_TRACE("\r\nDiscover this device with the name: \"%s\"\r\n",
                       app_gap_device_name);
@@ -253,7 +261,7 @@ static wiced_bt_dev_status_t thermistor_management_callback(
  seconds_timer_temperature_cb
 
  Function Description:
- @brief  This callback function is invoked on timeout of app. seconds timer.
+ @brief  This callback function is invoked on timeout of seconds timer.
 
  @param  arg
 
@@ -261,53 +269,16 @@ static wiced_bt_dev_status_t thermistor_management_callback(
  */
 static void seconds_timer_temperature_cb(uint32_t arg)
 {
-
-    volatile uint16_t   voltage_val_adc_in_mv   = 0;
-    volatile uint16_t   vddio_mv                = 0;
     volatile int16_t    temperature             = 0;
 
     /*
-     * Measure the voltage(in millivolts) on the channel being passed as an
-     * argument.
-     * To measure the voltage across the thermistor input channel-THERMISTOR_PIN
-     * To measure the reference voltage (vref)-ADC_INPUT_VDDIO
+     * Temperature values might vary upto +/-2 degree Celsius
      */
-
-    /* Input channel to measure Reference voltage for Voltage divider
-     * calculation for Thermistor
-     */
-    vddio_mv = wiced_hal_adc_read_voltage(ADC_INPUT_VDDIO);
-    WICED_BT_TRACE("\r\nVoltage in VDDIO channel\t\t\t%dmV\r\n", vddio_mv);
-
-    if(vddio_mv < VREF_THRESHOLD_1P85)
-    {
-           wiced_hal_adc_set_input_range(ADC_RANGE_0_1P8V);
-          /* Input channel to measure DC voltage(temperature)->THERMISTOR_PIN */
-           voltage_val_adc_in_mv = wiced_hal_adc_read_voltage(THERMISTOR_PIN);
-    }
-    else
-    {
-           wiced_hal_adc_set_input_range(ADC_RANGE_0_3P6V);
-         /* Input channel to measure DC voltage(temperature)-> THERMISTOR_PIN */
-           voltage_val_adc_in_mv = wiced_hal_adc_read_voltage(THERMISTOR_PIN);
-     }
-
-    WICED_BT_TRACE("Voltage in thermistor channel\t\t\t%dmV\r\n",
-                    voltage_val_adc_in_mv);
-
-    /*
-     * Temperature values might vary to +/-2 degree Celsius
-     */
-    temperature = get_temp_in_celsius(vddio_mv, voltage_val_adc_in_mv);
-    WICED_BT_TRACE("Temperature (in degree Celsius) \t\t%d.%02d\r\n",
+    temperature = thermistor_read();
+    WICED_BT_TRACE("\r\nTemperature (in degree Celsius) \t\t%d.%02d\r\n",
                     (temperature / 100),
-                    (temperature % 100));
+                    ABS(temperature % 100));
 
-    /* To check that connection is up and
-     * client is registered to receive notifications
-     * to send temperature data in Little Endian Format
-     * as per BT SIG's ESS Specification
-     */
     /*
      * app_ess_temperature value is set both for read operation and
      * notify operation.
@@ -315,6 +286,11 @@ static void seconds_timer_temperature_cb(uint32_t arg)
     app_ess_temperature[0] = (uint8_t) (temperature & 0xff);
     app_ess_temperature[1] = (uint8_t) ((temperature >> 8) & 0xff);
 
+    /* To check that connection is up and
+     * client is registered to receive notifications
+     * to send temperature data in Little Endian Format
+     * as per BT SIG's ESS Specification
+     */
     if (0 != thermistor_conn_id)
     {
         if (0 != (app_ess_temperature_client_char_config[0] &
@@ -372,12 +348,12 @@ static void thermistor_app_init(void)
     }
 
     /*
-     * The wiced_hal_adc automatically powers up ADC block before reading
+     * The thermistor_init() automatically powers up ADC block before reading
      * ADC registers and powers down after reading which reduces power
      * consumption. By multiple single shot sampling, it also improves the
      * accuracy of the reading.
      */
-    wiced_hal_adc_init();           /*ADC Initialization*/
+    thermistor_init();           /*ADC Initialization*/
 
     /* Starting the MILLI_SECONDS timer for every POLL_TIMER_IN_MS*/
     if ( WICED_SUCCESS == wiced_init_timer( &milli_seconds_timer,
@@ -436,26 +412,27 @@ static void thermistor_app_init(void)
 static wiced_result_t thermistor_set_advertisement_data(void)
 {
 
-    wiced_bt_ble_advert_elem_t  adv_elem[3];
-    wiced_result_t              result;
-    uint8_t         num_elem                = 0;
-    uint8_t         flag                    = BTM_BLE_GENERAL_DISCOVERABLE_FLAG | BTM_BLE_BREDR_NOT_SUPPORTED;
-    uint8_t         appearance_data         = FROM_BIT16_TO_8(APPEARANCE_GENERIC_THERMOMETER);
-    uint8_t         uuid_data               = FROM_BIT16_TO_8(UUID_SERVICE_ENVIRONMENTAL_SENSING);
+    wiced_bt_ble_advert_elem_t adv_elem[3];
+    wiced_result_t result;
+    uint8_t num_elem        = 0;
+    uint8_t flag            = BTM_BLE_GENERAL_DISCOVERABLE_FLAG |
+                              BTM_BLE_BREDR_NOT_SUPPORTED;
+    uint8_t appearance_data = FROM_BIT16_TO_8(APPEARANCE_GENERIC_THERMOMETER);
+    uint8_t uuid_data       = FROM_BIT16_TO_8(UUID_SERVICE_ENVIRONMENTAL_SENSING);
 
-    adv_elem[num_elem].advert_type          = BTM_BLE_ADVERT_TYPE_FLAG;
-    adv_elem[num_elem].len                  = sizeof(uint8_t);
-    adv_elem[num_elem].p_data               = &flag;
+    adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_FLAG;
+    adv_elem[num_elem].len         = sizeof(uint8_t);
+    adv_elem[num_elem].p_data      = &flag;
     num_elem++;
 
-    adv_elem[num_elem].advert_type          = BTM_BLE_ADVERT_TYPE_NAME_COMPLETE;
-    adv_elem[num_elem].len                  = strlen((const char *) wiced_app_cfg_settings.device_name);
-    adv_elem[num_elem].p_data               = (uint8_t *) wiced_app_cfg_settings.device_name;
+    adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_NAME_COMPLETE;
+    adv_elem[num_elem].len         = strlen((const char *) wiced_app_cfg_settings.device_name);
+    adv_elem[num_elem].p_data      = (uint8_t *) wiced_app_cfg_settings.device_name;
     num_elem++;
 
-    adv_elem[num_elem].advert_type          = BTM_BLE_ADVERT_TYPE_FLAG;
-    adv_elem[num_elem].len                  = sizeof(FROM_BIT16_TO_8(UUID_SERVICE_ENVIRONMENTAL_SENSING));
-    adv_elem[num_elem].p_data               = &uuid_data;
+    adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_FLAG;
+    adv_elem[num_elem].len         = sizeof(FROM_BIT16_TO_8(UUID_SERVICE_ENVIRONMENTAL_SENSING));
+    adv_elem[num_elem].p_data      = &uuid_data;
     num_elem++;
 
     result = wiced_bt_ble_set_raw_advertisement_data(num_elem, adv_elem);
@@ -463,9 +440,10 @@ static wiced_result_t thermistor_set_advertisement_data(void)
     return result;
 }
 
-/* Note for OTA support - The handles for OTA services should be defined as below in cycfg_gatt_db.h. If the
-   application is updated with Bluetooth Configurator, ensure the handles are set as below.
-   Also the OTA service should be last service in the GATT database.
+/* Note for OTA support - The handles for OTA services should be defined as
+   below in cycfg_gatt_db.h. If the application is updated with Bluetooth
+   Configurator, ensure the handles are set as below. Also the OTA service
+   should be last service in the GATT database.
 
 #define HDLS_FWUPGRADESERVICE                                            HANDLE_OTA_FW_UPGRADE_SERVICE
 #define HDLC_FWUPGRADESERVICE_FWUPGRADECONTOLPOINT                       HANDLE_OTA_FW_UPGRADE_CHARACTERISTIC_CONTROL_POINT

@@ -52,8 +52,8 @@
 #define SUPPORTED_FINGER_COUNT 1
 #define BOOTLOADER_VER_SIZE    2
 #define BATTERY_MONITOR_INTERRUPT   7
-#define TP_RSTN_ReleaseReset() GPIO_OUT(GPIO_RSTN_TP, GPIO_TOUCHPAD_ON)
-#define TP_RSTN_HoldReset() GPIO_OUT(GPIO_RSTN_TP, GPIO_TOUCHPAD_OFF)
+#define TP_RSTN_ReleaseReset() wiced_hal_gpio_configure_pin(GPIO_RSTN_TP, GPIO_OUTPUT_ENABLE, GPIO_TOUCHPAD_ON)
+#define TP_RSTN_HoldReset() wiced_hal_gpio_configure_pin(GPIO_RSTN_TP, GPIO_OUTPUT_ENABLE, GPIO_TOUCHPAD_OFF)
 
 #define PROXIMITY_TAG_ID    0x80
 #define xyDataStatus()      rpt.xyData.info

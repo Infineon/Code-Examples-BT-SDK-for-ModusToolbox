@@ -44,19 +44,29 @@ CY_SHOW_NEW_PROJECT := true
 
 CY_VALID_PLATFORMS = CYW920819EVB-02
 
+# CLI users need to change the below PLATFORM macro to the desired platform
 PLATFORM = CYW920819EVB-02
 
-#generate the OTA bin by default
+# Generate the OTA bin by default
 OTA_FW_UPGRADE=1
 
 # NOTE: This variable cannot be renamed or moved to a different file. It is updated by the ModusToolbox
 # middleware editor.
-CY_MAINAPP_SWCOMP_USED =  \
-  $(CY_WICED_LIB_COMP_BASE)/BT-SDK/common/libraries/fw_upgrade_lib
+CY_MAINAPP_SWCOMP_USED = \
+    $(CY_WICED_LIB_COMP_BASE)/BT-SDK/common/libraries/fw_upgrade_lib \
+
+ifeq ($(PLATFORM),CYBT-213043-MESH)
+CY_MAINAPP_SWCOMP_USED +=  \
+  $(CY_WICED_LIB_COMP_BASE)/BT-SDK/common/libraries/thermistor_ncp15xv103_lib
+else
+CY_MAINAPP_SWCOMP_USED +=  \
+  $(CY_WICED_LIB_COMP_BASE)/BT-SDK/common/libraries/thermistor_ncu15wf104_lib
+endif # PLATFORM
 
 # NOTE: This variable cannot be renamed or moved to a different file. It is
 # updated by the ModusToolbox middleware editor.
-CY_MAINAPP_SWCOMP_EXT =
+CY_MAINAPP_SWCOMP_EXT = \
+
 
 CY_APP_DEFINES =  \
   -DWICED_BT_TRACE_ENABLE \
@@ -68,17 +78,11 @@ CY_APP_SOURCE =  \
   ./GeneratedSource/cycfg_bt.h \
   ./GeneratedSource/cycfg_gatt_db.c \
   ./GeneratedSource/cycfg_gatt_db.h \
-  ./GeneratedSource/cycfg_pins.c \
-  ./GeneratedSource/cycfg_pins.h \
-  ./design.modus \
   ./secure/ecdsa256_pub.c \
-  ./thermistor_temp_db.c \
-  ./thermistor_temp_db.h \
   ./thermistor_util_functions.c \
   ./thermistor_util_functions.h \
   ./thermistor_gatt_handler.c \
   ./thermistor_gatt_handler.h \
-  ./wiced_platform.h \
   ./wiced_app_cfg.c \
   ./thermistor_app.c \
   ./readme.txt
@@ -86,16 +90,17 @@ CY_APP_SOURCE =  \
 CY_APP_RESOURCES =
 
 # Use OTA_SEC_FW_UPGRADE=1 in the make target to use secure OTA procedure.
-# See instructions in ota_firmware_upgrade.c file how to use secure upgrade.
+# After importing this project in ModusToolbox, see instructions in
+# libraries/fw_upgrade_lib/ota_fw_upgrade.c file on how to use secure upgrade.
 APP_FEATURES += OTA_SEC_FW_UPGRADE,app,enum,0,0,1
 OTA_SEC_FW_UPGRADE ?= 0
 ifeq ($(OTA_SEC_FW_UPGRADE), 1)
 CY_APP_DEFINES += -DOTA_SECURE_FIRMWARE_UPGRADE
 endif
 
-# declare local directory for include path
+# Declare local directory for include path
 CY_APP_PATH := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-# handle cygwin drive/path mangling for GNU tools - replace /cygdrive/c/ with c:/
+# Handle cygwin drive/path mangling for GNU tools - replace /cygdrive/c/ with c:/
 ifneq ($(findstring cygdrive,$(CY_APP_PATH)),)
 CY_APP_PATH := $(subst /, ,$(patsubst /cygdrive/%,%,$(CY_APP_PATH)))
 CY_APP_PATH := $(subst $(empty) $(empty),/,$(patsubst %,%:,$(firstword $(CY_APP_PATH))) $(wordlist 2,$(words $(CY_APP_PATH)),$(CY_APP_PATH)))

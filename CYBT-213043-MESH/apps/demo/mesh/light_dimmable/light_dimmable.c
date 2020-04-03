@@ -88,7 +88,7 @@ extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
  *          Constants
  ******************************************************/
 #define MESH_PID                0x311F
-#define MESH_VID                0x0001
+#define MESH_VID                0x0002
 #define MESH_FWID               0x311F000101010001
 #define MESH_CACHE_REPLAY_SIZE  0x0008
 
@@ -245,7 +245,7 @@ void mesh_app_init(wiced_bool_t is_provisioned)
 
         wiced_bt_mesh_set_raw_scan_response_data(num_elem, adv_elem);
     }
-    led_control_init();
+    led_control_init(LED_CONTROL_TYPE_LEVEL);
 
     wiced_init_timer(&attention_timer, attention_timer_cb, 0, WICED_SECONDS_PERIODIC_TIMER);
 

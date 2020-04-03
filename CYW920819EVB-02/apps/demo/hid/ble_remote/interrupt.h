@@ -79,4 +79,3 @@ void Intr_CIntr_Incomplete(Intr_State *, uint8_t gpio, uint8_t activeLogic, uint
 void Intr_CIntr(Intr_State *, void (*callBack)(void*, uint8_t), void * objPtr, uint8_t gpio, uint8_t activeLogic, uint16_t config);
 
 #endif
-

@@ -39,7 +39,7 @@
 * beacon library. It also demonstrates uses of multi-advertisement feature.
 *
 * During initialization the app configures advertisement packets for Eddystone and iBeacon
-* and starts advertisements via multi-advertisement APIs (non-connectable undirected advertisements).
+* and starts advertisements via multi-advertisement APIs.
 * It also sets up a 1 sec timer to update Eddystone TLM advertisement data
 *
 * Features demonstrated

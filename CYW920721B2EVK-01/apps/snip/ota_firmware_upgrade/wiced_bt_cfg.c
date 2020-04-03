@@ -183,12 +183,7 @@ const wiced_bt_cfg_settings_t app_cfg_settings =
 
 #if defined(CYW20735B0)
     .max_mtu_size                       = 517,                                                            /**< Maximum MTU size for GATT connections, should be between 23 and (max_attr_len + 5) */
-#endif
-
-#if defined(CYW20735B0)
     .def_ble_pwr_level                  = 12,                                                             /**< Max. power level of the device */
-#elif defined(CYW20721B1) || defined(CYW20721B2)
-    .default_ble_power_level            = 12,
 #endif
 
 #if defined(CYW20719B2) || defined(CYW20721B2) || defined(CYW20735B1) || defined(CYW43012C0) || defined(CYW20819A1)

@@ -56,7 +56,6 @@ APP_FEATURES= \
 	VERBOSE_THROUGHPUT_OUTPUT,app,enum,$(VERBOSE_THROUGHPUT_OUTPUT_DEFAULT),0,1
 
 CY_VALID_PLATFORMS = CYW920819EVB-02
-
 PLATFORM = CYW920819EVB-02
 
 # NOTE: This variable cannot be renamed or moved to a different file. It is updated by the ModusToolbox
@@ -81,13 +80,13 @@ CY_APP_SOURCE =  \
   ./GeneratedSource/cycfg_bt.h \
   ./GeneratedSource/cycfg_gatt_db.c \
   ./GeneratedSource/cycfg_gatt_db.h \
-  ./GeneratedSource/cycfg_pins.h \
-  ./GeneratedSource/cycfg_pins.c \
-  ./design.modus \
-  ./wiced_platform.h \
   ./le_coc/tput_le_coc.c \
   ./le_coc/tput_le_coc.h \
   ./readme.txt
+
+# if app needs to use custom design.modus, define path here, needs to match same structure
+# as main app but under components not examples
+CY_APP_COMPONENT_PATH_BASE := 208XX-A1_Bluetooth/apps/demo/throughput_test
 
 CY_APP_RESOURCES =
 

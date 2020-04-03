@@ -184,4 +184,3 @@ void Intr_CIntr(Intr_State * state, void (*callBack)(void*, uint8_t), void * obj
     Intr_CIntr_Incomplete(state, gpio, activeLogic, config);
     intrVtblPtr->registerForInterrupt(state, callBack, objPtr);
 }
-

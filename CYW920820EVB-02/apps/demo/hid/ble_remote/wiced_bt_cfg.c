@@ -1429,7 +1429,7 @@ const wiced_bt_cfg_settings_t wiced_bt_hid_cfg_settings =
 
         48,                                                         /**< Low duty undirected connectable minimum advertising interval. 48 *0.625 = 30ms */
         48,                                                         /**< Low duty undirected connectable maximum advertising interval */
-#ifdef ALLOW_SDS_IN_DISCOVERABLE
+#if defined(ALLOW_SDS_IN_DISCOVERABLE) || (defined(ENDLESS_LE_ADVERTISING_WHILE_DISCONNECTED) && defined(SUPPORT_EPDS))
         0,                                                          /**< Low duty undirected connectable advertising duration in seconds (0 for infinite) */
 #else
         180,                                                        /**< Low duty undirected connectable advertising duration in seconds (0 for infinite) */
@@ -1439,7 +1439,7 @@ const wiced_bt_cfg_settings_t wiced_bt_hid_cfg_settings =
 
         2048,                                                       /**< Low duty directed connectable minimum advertising interval. 2048 * 0.625ms = 1.28 seconds */
         2048,                                                       /**< Low duty directed connectable maximum advertising interval. 2048 * 0.625ms = 1.28 seconds */
-        0,                                                         /**< Low duty directed connectable advertising duration in seconds (0 for infinite) */
+        0,                                                          /**< Low duty directed connectable advertising duration in seconds (0 for infinite) */
 
         WICED_BT_CFG_DEFAULT_HIGH_DUTY_NONCONN_ADV_MIN_INTERVAL,    /**< High duty non-connectable minimum advertising interval */
         WICED_BT_CFG_DEFAULT_HIGH_DUTY_NONCONN_ADV_MAX_INTERVAL,    /**< High duty non-connectable maximum advertising interval */
@@ -1493,7 +1493,7 @@ const wiced_bt_cfg_settings_t wiced_bt_hid_cfg_settings =
         0                                                           /**< Maximum simultaneous remote control links */
     },
 
-		
+
 	/* LE Address Resolution DB size  */
     5,                                                               /**< LE Address Resolution DB settings - effective only for pre 4.2 controller*/
 
@@ -1530,6 +1530,3 @@ const wiced_bt_cfg_buf_pool_t wiced_bt_hid_cfg_buf_pools[WICED_BT_CFG_NUM_BUF_PO
 #endif
     { 1024,      2  },      /* Extra Large Buffer Pool - Used for avdt media packets and miscellaneous (if not needed, set buf_count to 0) */
 };
-
-
-

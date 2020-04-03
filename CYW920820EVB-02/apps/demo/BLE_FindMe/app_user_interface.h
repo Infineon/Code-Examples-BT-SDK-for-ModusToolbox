@@ -54,8 +54,8 @@
 *        Macro Definitions
 *******************************************************************************/
 /* LED pin assignments for advertising event and IAS alert levels */
-#define ADV_LED_GPIO                    WICED_GET_PIN_FOR_LED(1)
-#define IAS_LED_GPIO                    WICED_GET_PIN_FOR_LED(2)
+#define ADV_LED_GPIO                    WICED_GET_PIN_FOR_LED(WICED_PLATFORM_LED_1)
+#define IAS_LED_GPIO                    WICED_GET_PIN_FOR_LED(WICED_PLATFORM_LED_2)
 
 /* Update rate of LED's in milliseconds when blinking */
 #define ADV_LED_UPDATE_RATE_MS          250

@@ -88,20 +88,41 @@ GATT database in the location mentioned above.
 
 Application Settings
 --------------------
-Application specific settings are -
 TESTING_USING_HCI
-    Use this option for testing with Bluetooth Profile Client Control. The Client Control
-    UI can be used to provide input.
+    Use this option for testing with Bluetooth Profile Client Control. The Client
+    Control UI can be used to provide input. When this option is enabled, the
+    device will not enter SDS/ePDS for power saving.
+
 OTA_FW_UPGRADE
-    Use this option for Over The Air (OTA) upgrade
-OTA_SEC_FW_UPGRADE
-    Use this option for secure OTA firmware upgrade. When this option is used
-    the above option for OTA_FW_UPGRADE shuold also be used.
+    Use this option for enabling firmware upgrade over the Air (OTA) capability.
+
+  OTA_SEC_FW_UPGRADE
+    Use this option for secure OTA firmware upgrade. OTA_FW_UPGRADE option must be
+    enabled for this option to take effect.
+
 ENABLE_SCROLL
-    Use this option to enable scroll
+    Use this option to enable scroll function. This option requires actual demo mouse
+    that has quadrature hardware.
+
 ENABLE_MOTION
-    Use this option to enable motion
+    Use this option to enable motion function. This option requires actual demo mouse
+    hardware to be functional.
+
 ASSYMETRIC_SLAVE_LATENCY
-    Use this option to set assymetric slave latency.
+    Use this option to enable assymetric slave latency.
+
+    Background:
+    In early days, some HID host devices will always reject HID slave's link
+    parameter update request. Because of this, HID device will end up consuming
+    high power when slave latency was short. To work around this issue, we use
+    Asymmetric Slave Latency method to save power by waking up only at multiple
+    time of the communication anchor point. When this option is enabled,
+
+    1.  We do not send LL_CONNECTION_PARAM_REQ.
+    2.  We simply start Asymmetric Slave Latency by waking up at multiple times
+        of given slave latency.
+
+    Since this is not a standard protocol, we do not recommend enabling this
+    option unless if it is necessary to save power to work around some HID hosts.
 
 -------------------------------------------------------------------------------

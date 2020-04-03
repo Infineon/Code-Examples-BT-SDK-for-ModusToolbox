@@ -79,8 +79,10 @@ void led_control_init(uint8_t control_type)
     pwm_config_t pwm_config;
 
     if (control_type == LED_CONTROL_TYPE_ONOFF)
-        return;
-
+    {
+        // Maintain gpio state during sleep
+        wiced_hal_gpio_slimboot_reenforce_cfg (WICED_GPIO_PIN_LED_2, GPIO_OUTPUT_ENABLE);
+    }
     else if (control_type == LED_CONTROL_TYPE_LEVEL)
     {
         /* configure PWM */

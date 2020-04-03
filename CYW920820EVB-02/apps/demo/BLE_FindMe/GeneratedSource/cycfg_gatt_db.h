@@ -77,4 +77,3 @@ extern uint8_t app_ias_alert_level[];
 extern const uint16_t app_ias_alert_level_len;
 
 #endif /* CYCFG_GATT_DB_H */
-

@@ -72,7 +72,7 @@ extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
  *          Constants
  ******************************************************/
 #define MESH_PID                0x3122
-#define MESH_VID                0x0001
+#define MESH_VID                0x0002
 #define MESH_FWID               0x3122000101010001
 #define MESH_CACHE_REPLAY_SIZE  0x0008
 
@@ -665,4 +665,3 @@ void mesh_sensor_server_process_setting_changed(uint8_t element_idx, uint16_t pr
 {
     WICED_BT_TRACE("settings changed  property id of sensor = %x , sensor prop id = %x \n", property_id, setting_property_id);
 }
-

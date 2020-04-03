@@ -38,12 +38,11 @@ CONFIG = Debug
 
 CY_EXAMPLE_NAME = HAL_Dual_SPI_Master
 
-CY_EXAMPLE_DESCRIPTION = This application demonstrates two SPI master instances via multiple threads on CYW9208XXEVB-02. SPI1 instance is used to communicating with an external SPI sensor and SPI2 instance is used to communicate with on-board SFLASH.
+CY_EXAMPLE_DESCRIPTION = This application demonstrates two SPI master instances via multiple threads. SPI1 instance is used to communicate with an external SPI sensor and SPI2 instance is used to communicate with on-board SFLASH.
 
 CY_SHOW_NEW_PROJECT := true
 
 CY_VALID_PLATFORMS = CYW920819EVB-02
-
 PLATFORM = CYW920819EVB-02
 
 CY_APP_DEFINES += -DWICED_BT_TRACE_ENABLE
@@ -54,11 +53,11 @@ CY_MAINAPP_SWCOMP_EXT =
 
 CY_APP_SOURCE = \
   ./dual_spi_master.c \
-  ./readme.txt \
-  ./wiced_platform.h \
-  ./design.modus \
-  ./GeneratedSource/cycfg_pins.c \
-  ./GeneratedSource/cycfg_pins.h
+  ./readme.txt
+
+# if app needs to use custom design.modus, define path here, needs to match same structure
+# as main app but under components not examples
+CY_APP_COMPONENT_PATH_BASE := 208XX-A1_Bluetooth/apps/demo/datalogger/dual_spi_master
 
 CY_APP_RESOURCES =
 

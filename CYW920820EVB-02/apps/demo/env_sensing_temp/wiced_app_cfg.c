@@ -209,4 +209,3 @@ const wiced_bt_cfg_buf_pool_t wiced_app_cfg_buf_pools[WICED_BT_CFG_NUM_BUF_POOLS
     { 720,      5   },      /* Large Buffer Pool  (used for HCI ACL messages) */
     { 1024,     8   },      /* Extra Large Buffer Pool - Used for avdt media packets and miscellaneous (if not needed, set buf_count to 0) */
 };
-

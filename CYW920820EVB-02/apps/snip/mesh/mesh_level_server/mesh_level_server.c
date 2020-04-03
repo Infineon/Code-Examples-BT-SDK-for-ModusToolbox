@@ -57,7 +57,7 @@ extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
  *          Constants
  ******************************************************/
 #define MESH_PID                0x3006
-#define MESH_VID                0x0001
+#define MESH_VID                0x0002
 #define MESH_FWID               0x3006000101010001
 #define MESH_CACHE_REPLAY_SIZE  0x0008
 
@@ -253,4 +253,3 @@ void mesh_level_process_set_level(uint8_t element_idx, wiced_bt_mesh_level_statu
 {
     WICED_BT_TRACE("level srv set idx:%d level:%d present:%d\n", element_idx, p_status->target_level, p_status->present_level, p_status->remaining_time);
 }
-

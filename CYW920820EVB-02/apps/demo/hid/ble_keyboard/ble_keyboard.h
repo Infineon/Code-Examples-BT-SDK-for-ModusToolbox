@@ -47,6 +47,15 @@
 #include "blehidlink.h"
 #include "blehostlist.h"
 
+extern const uint8_t blehid_db_data[];
+extern const uint16_t blehid_db_size;
+extern const wiced_bt_cfg_settings_t wiced_bt_hid_cfg_settings;
+extern const wiced_bt_cfg_buf_pool_t wiced_bt_hid_cfg_buf_pools[];
+extern uint16_t blehostlist_flags;
+extern uint8_t blekb_key_std_rpt[];
+extern uint8_t blekb_bitmap_rpt[];
+extern uint8_t blekb_func_lock_rpt;
+
 /// Maximum number of keys supported by our HID
 //#define KB_MAX_KEYS 144     // 8x18=144 ( 8x20 = 160 max )
 #define KB_MAX_KEYS 56     // 7x8=56 ( 8x20 = 160 max )

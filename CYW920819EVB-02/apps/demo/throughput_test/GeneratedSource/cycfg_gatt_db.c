@@ -84,4 +84,3 @@ const uint16_t app_gap_device_name_len = (sizeof(app_gap_device_name));
 const uint16_t app_gap_appearance_len = (sizeof(app_gap_appearance));
 const uint16_t app_tput_notify_len = (sizeof(app_tput_notify));
 const uint16_t app_tput_notify_descriptor_len = (sizeof(app_tput_notify_descriptor));
-

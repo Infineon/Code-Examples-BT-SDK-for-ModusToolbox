@@ -256,4 +256,3 @@ extern BD_ADDR  bd_addr_any;
 extern BD_ADDR  bd_addr_null;
 
 #endif /* BTA_HS_INT_H */
-

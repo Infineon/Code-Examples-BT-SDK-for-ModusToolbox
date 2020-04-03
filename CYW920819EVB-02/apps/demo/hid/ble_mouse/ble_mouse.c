@@ -157,9 +157,6 @@ uint8_t   battery_level = 100;
 uint8_t blemouse_input_rpt[MOUSE_REPORT_SIZE] = {0, };       //map to (&(kbAppState->kbapp_stdRpt.modifierKeys))[kbAppState->kbapp_stdRptSize]
 uint8_t blemouse_connection_ctrl_rpt = 0;
 
-
-extern wiced_bt_cfg_settings_t wiced_bt_hid_cfg_settings;
-
 uint8_t firstTransportStateChangeNotification = 1;
 wiced_timer_t blemouse_allow_sleep_timer;
 wiced_timer_t blemouse_conn_param_update_timer;
@@ -1529,4 +1526,3 @@ void mouseapp_aon_restore(void)
         wiced_ble_hidd_link_aon_action_handler(BLEHIDLINK_RESTORE_FROM_AON);
     }
 }
-

@@ -63,22 +63,71 @@ GATT database in the location mentioned above.
 
 Application Settings
 --------------------
-Application specific settings are -
 TESTING_USING_HCI
-    Use this option for testing with Bluetooth Profile Client Control. The Client Control
-    UI can be used to provide input.
+    Use this option for testing with Bluetooth Profile Client Control. The Client
+    Control UI can be used to provide input. When this option is enabled, the
+    device will not enter SDS/ePDS for power saving.
+
 OTA_FW_UPGRADE
-    Use this option for Over The Air (OTA) upgrade
+    Use this option for enabling firmware upgrade over the Air (OTA) capability.
+
 OTA_SEC_FW_UPGRADE
-    Use this option for secure OTA firmware upgrade. When this option is used
-    the above option for OTA_FW_UPGRADE shuold also be used.
-ASSYMETRIC_SLAVE_LATENCY
-    Use this option to set assymetric slave latency.
-LE_LOCAL_PRIVACY
-    Use this option to set LE local privacy.
-SKIP_PARAM_UPDATE
-    Use this option to set skip parameter update.
+    Use this option for secure OTA firmware upgrade. OTA_FW_UPGRADE option must be
+    enabled for this option to take effect.
+
 AUTO_RECONNECT
-    Use this option to allow auto reconnect.
+    Use this option to enable auto reconnect. By enabling this option, the device
+    will always stay connected. If it is disconnected, it try to reconnect until
+    it is connected.
+
+    This option should be used together with DISCONNECTED_ENDLESS_ADV. When this
+    option is enabled, the HID device will always try to maintain connection with
+    the paired HID host; therefore, if the link is down, it will continuously try
+    to reconnect. To conserve power, it should allow entering SDS/ePDS while
+    advertising; thus, the DISCONNECTED_ENDLESS_ADV option should be enabled;
+    otherwise, it may drain battery quickly if host was not available to reconnect.
+
+DISCONNECTED_ENDLESS_ADV
+    Use this option to enable disconnected endless advertisement. When this option
+    is used, the device will do advertising forever until it is connected. To
+    conserve power, it allows SDS/ePDS and do the advertising in a long interval.
+
+SKIP_PARAM_UPDATE
+    Use this option to skip to send link parameter update request.
+    When this option is disabled, if the peer device (master) assigned link parameter
+    is not within the device's preferred range, the device will send a request for
+    the desired link parameter change. This option can be enabled to stop the device
+    from sending the reuqest and accept the given link parameter as is.
+
+    Background:
+    In some OS (peer host), after link is up, it continuously sends different
+    parameter of LINK_PARAM_CHANGE over and over for some time. When the parameter
+    is not in our device preferred range, the firmware was rejecting and renegotiating
+    for new preferred parameter. It can lead up to endless and unnecessary overhead
+    in link parameter change. Instead of keep rejecting the link parameter, by using
+    this option, we accept peer requested link parameter as it and starts a timer to
+    send the final link parameter change request later when the peer host settles down
+    in link parameter change.
+
+ASSYMETRIC_SLAVE_LATENCY
+    Use this option to enable assymetric slave latency.
+
+    Background:
+    In early days, some HID host devices will always reject HID slave's link
+    parameter update request. Because of this, HID device will end up consuming
+    high power when slave latency was short. To work around this issue, we use
+    Asymmetric Slave Latency method to save power by waking up only at multiple
+    time of the communication anchor point. When this option is enabled,
+
+    1.  We do not send LL_CONNECTION_PARAM_REQ.
+    2.  We simply start Asymmetric Slave Latency by waking up at multiple times
+        of given slave latency.
+
+    Since this is not a standard protocol, we do not recommend enabling this
+    option unless if it is necessary to save power to work around some HID hosts.
+
+LE_LOCAL_PRIVACY
+    When enabled, the device uses RPA (Random Private Address).
+    When disabled, the device uses Public static address.
 
 -------------------------------------------------------------------------------

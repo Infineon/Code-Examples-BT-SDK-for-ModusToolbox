@@ -151,4 +151,3 @@ typedef enum
 
 
 #endif // _HELLO_SENSOR_H_
-

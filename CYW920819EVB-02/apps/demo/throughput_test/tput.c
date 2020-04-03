@@ -132,8 +132,8 @@ extern const wiced_platform_led_config_t platform_led[];
 #define ONE_BYTE                            8
 #define ONE_SEC_TIME                        1
 #define ONE_MS_TIME                         1
-#define GATT_CONNECT_LED                    WICED_GET_PIN_FOR_LED(2) //LED2(D2 on kit)
-#define CONGESTION_LED                      WICED_GET_PIN_FOR_LED(1) //LED1(D1 on kit)
+#define GATT_CONNECT_LED                    WICED_GET_PIN_FOR_LED(WICED_PLATFORM_LED_2) //LED2(D2 on kit)
+#define CONGESTION_LED                      WICED_GET_PIN_FOR_LED(WICED_PLATFORM_LED_1) //LED1(D1 on kit)
 
 /**************************************************************************************
  *                                Variable Definitions

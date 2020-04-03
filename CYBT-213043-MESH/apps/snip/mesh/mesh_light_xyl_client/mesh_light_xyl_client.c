@@ -54,7 +54,7 @@ extern wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
  *          Constants
  ******************************************************/
 #define MESH_PID                0x3010
-#define MESH_VID                0x0001
+#define MESH_VID                0x0002
 #define MESH_FWID               0x3010000101010001
 #define MESH_CACHE_REPLAY_SIZE  0x0008
 
@@ -480,6 +480,3 @@ void mesh_light_xyl_hci_event_send_default_status(wiced_bt_mesh_hci_event_t *p_h
 }
 
 #endif
-
-
-

@@ -55,8 +55,10 @@ const uint8_t gatt_database[] =
             CHAR_DESCRIPTOR_UUID16 (HDLD_ESS_TEMPERATURE_VALID_RANGE, __UUID_DESCRIPTOR_VALID_RANGE, LEGATTDB_PERM_READABLE),
 
 #ifdef OTA_SECURE_FIRMWARE_UPGRADE
+    /* The UUID for the Secure OTA service must match exactly to the below UUID value */
     PRIMARY_SERVICE_UUID128(HDLS_FWUPGRADESERVICE, UUID_OTA_SEC_FW_UPGRADE_SERVICE),
 #else
+    /* The UUID for the OTA service must match exactly to the below chosen Cypress UUID value */
     /* Primary Service: FWUpgradeService */
     PRIMARY_SERVICE_UUID128 (HDLS_FWUPGRADESERVICE, __UUID_SERVICE_FWUPGRADESERVICE),
 #endif
@@ -117,4 +119,3 @@ const uint16_t app_ess_temperature_valid_range_len = (sizeof(app_ess_temperature
 const uint16_t app_fwupgradeservice_fwupgradecontolpoint_len = (sizeof(app_fwupgradeservice_fwupgradecontolpoint));
 const uint16_t app_fwupgradeservice_fwupgradecontolpoint_client_char_config_len = (sizeof(app_fwupgradeservice_fwupgradecontolpoint_client_char_config));
 const uint16_t app_fwupgradeservice_fwupgradedata_len = (sizeof(app_fwupgradeservice_fwupgradedata));
-

@@ -35,7 +35,7 @@ CYW920819EVB-02:
 CYBT-213043-MESH
     35-SMT package, PIR sensor (motion detection), Ambient Light Sensor and thermistor,
     user switches and RGB LEDs, with additional 1MB External Serial Flash.
-    CYW20819-based dual-mode (BLE/BR/EDR) Bluetooth 5.0 with SIG MESH Qualified Module, 
+    CYW20819-based dual-mode (BLE/BR/EDR) Bluetooth 5.0 with SIG MESH Qualified Module,
     FCC, ISED, MIC, and CE Certified Module.
     USB connector for power, programming and USB-UART bridge.
     Note: Max UART baud rate is 1M. Use baud rate of 115200 for Client Control.
@@ -105,6 +105,11 @@ Bluetooth Configurator:
     Run this tool from ModusToolbox IDE "Configure Device" menu -> Peripherals -> Bluetooth
     -> External tools. It is supported on Windows, Linux and macOS.
 
+Power Estimator:
+    Use this application to get an estimate of power consumed by your application, running on CYW920819EVB-02 kit.
+    Run this tool from ModusToolbox <Install Dir>\tools\cype-tool-1.0\cype-tool
+    It is supported on Windows, Linux and macOS.
+
 Tracing
 -------
 To view application traces, there are 2 methods available. Note that the application
@@ -128,45 +133,35 @@ UART
     Select the UART port you want the application to be downloaded. For example 'COM6'
     on Windows or '/dev/ttyWICED_HCI_UART0' on Linux or '/dev/tty.usbserial-000154' on macOS.
     By default, the SDK will auto detect the port.
-APP_XIP
-    This setting controls the "eXecute In Place" build option for an application. Here XIP
-    means executing directly from On Chip Flash, rather than copying code to RAM first.
-    Choices include 'xip' and 'xip_pi', which adds position independence. The trade-offs
-    for the two settings are overall image size and compatible Over The Air update methods.
-    The xip_pi build results in a bit larger image because tables and code are added to support
-    position independent calls to ROM functions or accesses to RAM data. The position independence
-    allows the load location of the image to be swapped, so fail-safe OTA firmware updates that always
-    keep a known-good application image in On Chip Flash can be used. The drawback is that less than
-    half of the On Chip Flash is available, limiting the overall xip_pi image size.
-    The 'xip' option is built to run from one load location and optimizes size. The load location
-    cannot be swapped to support OCF-only firmware updates. The recommended OTA firmware update method
-    for 'xip' uses external flash to temporarily store the image during download and verification.
-    This means the 'xip' method can support images larger than half the OCF size, but requires
-    external serial flash for storage.
 ENABLE_DEBUG
     For HW debugging, select the option '1'. See the document WICED-Hardware-Debugging.pdf
-    for more information.
+    for more information. This setting configures GPIO for SWD.
+    CYW920819EVB-02/CYW920820EVB-02: SWD signals are shared with D4 and D5, see SW9 in schematics.
+    CYBT-213043-MESH/CYBT-213043-EVAL: SWD signals are routed to P12=SWDCK and P13=SWDIO. Use
+    expansion connectors to connect VDD, GND, SWDCK and SWDIO to your SWD Debugger probe.
+    CYW989820EVB-01: SWDCK (P02) is routed to the J13 DEBUG connector, but not SWDIO. Add a wire
+    from J10 pin 3 (PUART CTS) to J13 pin 2 to connect GPIO P10 to SWDIO.
+POWER_ESTIMATOR
+    For power estimation, select the option "yes". See the cype-tool help for more information.
+    This setting enables power estimation feature of your app on CYW920819EVB-02 kit.
 
 Downloading application to kit
 ------------------------------
 If you have issues downloading to the kit, follow the steps below -
 - Press and hold the 'Recover' button on the kit.
-- Press and hold the 'Reset' button on the kit. 
+- Press and hold the 'Reset' button on the kit.
 - Release the 'Reset' button.
 - After one second, release the 'Recover' button.
 
 After downloading the application, press the 'Reset' button on the kit.
 
-When using CYW9208XXEVB kit on macOS, make sure to download the latest FTDI drivers
-from ftdichip.com (especially for macOS 10.10 or below).
-
 Over The Air (OTA) Firmware Upgrade
 -----------------------------------
 Application that support OTA upgrade can be updated via peer OTA apps located in the folder -
 <Install Dir>\ModusToolbox_1.1\libraries\bt_sdk-1.x\components\BT-SDK\common\peer_apps\ota_firmware_upgrade
-See the readme.txt file located in the above folder for instructions. 
+See the readme.txt file located in the above folder for instructions.
 To generate OTA image for the app, append command line OTA_FW_UPGRADE=1 to the build, for example
-> make PLATFORM=CYW920819EVB_02 OTA_FW_UPGRADE=1
+> make PLATFORM=CYW920819EVB-02 OTA_FW_UPGRADE=1
 This will generate <app>.bin file in the 'build' folder.
 
 ------------------------------------------------------------------------------------

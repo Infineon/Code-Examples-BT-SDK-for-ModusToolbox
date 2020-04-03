@@ -17,7 +17,8 @@
  *                                Instructions
  ******************************************************************************/
  To demonstrate the app, work through the following steps.
- 1. Plug the CYW920819EVB-02 evaluation board to your computer.
+ 1. Plug the evaluation board to your computer. Check the modus.mk file to see
+    the list of supported platforms.
  2. Build and download the application. (See CYW920819EVB-02 User Guide)
  3. Use Terminal emulation tools like Teraterm or Putty to view the
     trace messages(See Kit User Guide).

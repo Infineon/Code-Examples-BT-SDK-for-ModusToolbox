@@ -945,4 +945,3 @@ uint8_t hci_control_avrc_handle_ctrlr_command( uint16_t cmd_opcode, uint8_t *p_d
     return (status == WICED_SUCCESS) ? HCI_CONTROL_STATUS_SUCCESS : HCI_CONTROL_STATUS_FAILED;
 
 }
-

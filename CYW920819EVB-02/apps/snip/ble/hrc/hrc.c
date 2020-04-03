@@ -385,16 +385,33 @@ void hrc_scan_result_cback( wiced_bt_ble_scan_results_t *p_scan_result, uint8_t 
     wiced_bool_t            ret_status;
     uint8_t                 length;
     uint8_t *               p_data;
-    uint16_t                heart_rate_service_uuid = UUID_SERVICE_HEART_RATE;
+    uint16_t                service_uuid16=0;
     if ( p_scan_result )
     {
-        // Advertisement data from heart rate server should have Advertisement type SERVICE_UUID_16
+        /* Search for SERVICE_UUID_16 element in the Advertisement data received.Check for both
+        complete and partial list */
         p_data = wiced_bt_ble_check_advertising_data( p_adv_data, BTM_BLE_ADVERT_TYPE_16SRV_COMPLETE, &length );
-
-        // Check if  the heart rate service uuid is there in the advertisement
-        if ( ( p_data == NULL ) || ( length != LEN_UUID_16 ) || ( memcmp( p_data, &heart_rate_service_uuid, LEN_UUID_16) != 0 ) )
+        if (p_data == NULL)
         {
-            // wrong device
+            p_data = wiced_bt_ble_check_advertising_data( p_adv_data, BTM_BLE_ADVERT_TYPE_16SRV_PARTIAL, &length );
+            if (p_data == NULL)
+                return;     // No UUID_16 element
+        }
+
+        while (length >= LEN_UUID_16)
+        {
+            STREAM_TO_UINT16(service_uuid16, p_data);
+            if (service_uuid16 == UUID_SERVICE_HEART_RATE)
+            {
+                // UUID16 Heart rate service found
+                break;
+            }
+            length -= LEN_UUID_16;
+        }
+
+        if (service_uuid16 != UUID_SERVICE_HEART_RATE)
+        {
+            // UUID16 Heart rate service not found. Ignore device
             return;
         }
 
@@ -840,4 +857,3 @@ void hrc_trace_callback(wiced_bt_hci_trace_type_t type, uint16_t length, uint8_t
 {
     wiced_transport_send_hci_trace(NULL, type, length, p_data);
 }
-

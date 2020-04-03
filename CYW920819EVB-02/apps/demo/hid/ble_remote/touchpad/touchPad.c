@@ -283,7 +283,7 @@ void TouchPad_initialize()
         TP_RSTN_HoldReset();   // TP is not in working condition, holding it reset.
     }
 
-    intrVtblPtr->clearInterrupt(&tpIntr);	
+    intrVtblPtr->clearInterrupt(&tpIntr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
